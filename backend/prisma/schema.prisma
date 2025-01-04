@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  first_name   String
+  middle_name  String
+  last_name    String
+  password     String
+  role         String   @default("STUDENT")
+  classes      Class[]
+  createdAt    DateTime @default(now())
+  lastModified DateTime @updatedAt
+}
+
+model Subject {
+  id           Int        @id @default(autoincrement())
+  name         String
+  Class        Class      @relation(fields: [classId], references: [id])
+  classId      Int
+  description  String
+  tests        Test[]
+  questions    Question[]
+  createdAt    DateTime   @default(now())
+  lastModified DateTime   @updatedAt
+}
+
+model Class {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String
+  subjects     Subject[]
+  users        User[]
+  createdAt    DateTime  @default(now())
+  lastModified DateTime  @updatedAt
+  Test Test[]
+}
+
+model Question_Option {
+  id              Int       @id @default(autoincrement())
+  text            String
+  image_url       String?
+  Question        Question? @relation("CorrectOption")
+  QuestionOptions Question? @relation("QuestionOptions", fields: [questionId], references: [id])
+  questionId      Int?
+  createdAt       DateTime  @default(now())
+  lastModified    DateTime  @updatedAt
+}
+
+model Question {
+  id                  Int               @id @default(autoincrement())
+  subject             Subject           @relation(fields: [subjectId], references: [id])
+  subjectId           Int
+  correctOption       Question_Option   @relation("CorrectOption", fields: [correctOptionId], references: [id])
+  correctOptionId     Int               @unique
+  options             Question_Option[] @relation("QuestionOptions")
+  Test                Test[]
+  explanation         String?
+  explanationImageUrl String?
+  createdAt           DateTime          @default(now())
+  lastModified        DateTime          @updatedAt
+}
+
+model Test {
+  id           Int        @id @default(autoincrement())
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+  subjectId    Int
+  questions    Question[]
+  class        Class      @relation(fields: [classId], references: [id])
+  classId      Int
+  createdAt    DateTime   @default(now())
+  lastModified DateTime   @updatedAt
+}
