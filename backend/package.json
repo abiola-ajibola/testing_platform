@@ -1,0 +1,24 @@
+{
+  "name": "testing-platform-backend",
+  "version": "1.0.0",
+  "main": "build/app.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node build/app.js",
+    "build": "tsc",
+    "dev": "nodemon -e ts --exclude build/ --exec 'tsc && node build/app.js'"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.1.0",
+    "typescript": "^5.7.2"
+  }
+}
