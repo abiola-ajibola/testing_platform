@@ -1,9 +1,5 @@
+import { Role } from "../../constants";
 import { prisma } from "../../services/db";
-
-enum Role {
-  STUDENT = "STUDENT",
-  ADMIN = "ADMIN",
-}
 
 export interface ICreateUser {
   username: string;
@@ -13,10 +9,39 @@ export interface ICreateUser {
   middle_name: string;
 }
 
+export type TGetallUsersQuery = Partial<
+  Omit<ICreateUser, "password"> & {
+    page: number;
+    perPage: number;
+    role: Role;
+  }
+>;
+
 class User {
-  async getOne(username: string) {
+  async getOne(id: number) {
     return await prisma.user.findUnique({
-      where: { username },
+      where: { id },
+    });
+  }
+
+  async getAll(
+    { page = 1, perPage = 10, ...restFilters }: TGetallUsersQuery = {
+      page: 1,
+      perPage: 10,
+    }
+  ) {
+    console.log({ restFilters });
+    const where = Object.entries(restFilters).reduce((acc, [key, value]) => {
+      if (value) {
+        return { ...acc, [key]: { contains: value } };
+      }
+      return acc;
+    }, {});
+    return await prisma.user.findMany({
+      skip: page * perPage - perPage,
+      take: perPage,
+      where,
+      // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
     });
   }
 
@@ -31,14 +56,18 @@ class User {
     return await prisma.user.create({ data: { ...data, role: Role.STUDENT } });
   }
 
-  async updateOne(
-    data: Partial<ICreateUser> & { username: string }
-  ) {
+  async updateOne(data: Partial<ICreateUser> & { id: number }) {
     return prisma.user.update({
       where: {
-        username: data.username,
+        id: data.id,
       },
       data: { ...data },
+    });
+  }
+
+  async deleteOne(id: number) {
+    return await prisma.user.delete({
+      where: { id },
     });
   }
 }

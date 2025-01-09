@@ -2,11 +2,13 @@ import { Request, Response, Router } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { user } from "../../models/user";
 import { comparePassword, hashPassword } from "../../utils/crypto/password";
+import { isAuthenticated } from "../../middlewares/auth";
 import {
-  isAuthenticated,
-  validateSchema,
-} from "../../middlewares/auth";
-import { changePasswordValidationSchema, loginValidationSchema, signupValidationSchema } from "../../utils/validation/auth";
+  changePasswordValidationSchema,
+  loginValidationSchema,
+  signupValidationSchema,
+} from "../../utils/validation/auth";
+import { validateBody } from "../../middlewares";
 
 async function signup(req: Request, res: Response) {
   try {
@@ -126,6 +128,7 @@ async function changePassword(req: Request, res: Response) {
   try {
     const new_password = await hashPassword(req.body.new_password);
     await user.updateOne({
+      id: _user.id,
       username: req.body.username,
       password: new_password,
     });
@@ -138,10 +141,19 @@ async function changePassword(req: Request, res: Response) {
   }
 }
 
+async function me(req: Request, res: Response) {
+  res.status(StatusCodes.OK).json({ data: req.session.user });
+}
+
 const authRouter = Router();
-authRouter.patch("/change-password", validateSchema(changePasswordValidationSchema), changePassword);
-authRouter.post("/login", validateSchema(loginValidationSchema), login);
-authRouter.post("/signup", validateSchema(signupValidationSchema), signup);
+authRouter.patch(
+  "/change-password",
+  validateBody(changePasswordValidationSchema),
+  changePassword
+);
+authRouter.post("/login", validateBody(loginValidationSchema), login);
+authRouter.post("/signup", validateBody(signupValidationSchema), signup);
 authRouter.get("/logout", isAuthenticated, logout);
+authRouter.get("/me", isAuthenticated, me);
 
 export { authRouter };

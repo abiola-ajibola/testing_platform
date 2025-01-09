@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
 import { object, ref, string } from "yup";
+import { Role } from "../../constants";
 
 export const loginValidationSchema = object({
   username: string().required("username is required"),
@@ -23,4 +23,14 @@ export const signupValidationSchema = object({
   first_name: string().required("first name is required"),
   last_name: string().required("last name is required"),
   middle_name: string().nullable(),
+  role: string().oneOf([Role.STUDENT, Role.ADMIN]).nullable(),
+});
+
+export const updateUserValidationSchema = object({
+  username: string().nullable(),
+  password: string().nullable(),
+  first_name: string().nullable(),
+  last_name: string().nullable(),
+  middle_name: string().nullable(),
+  role: string().oneOf([Role.STUDENT, Role.ADMIN]).nullable(),
 });

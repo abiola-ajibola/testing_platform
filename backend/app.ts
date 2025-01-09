@@ -3,6 +3,7 @@ import cors from "cors";
 import session, { Store } from "express-session";
 import StoreInitiator from "connect-sqlite3";
 import { authRouter } from "./controllers/auth";
+import { usersRouter } from "./controllers/user";
 
 declare module "express-session" {
   interface Session {
@@ -20,7 +21,7 @@ app.use(
   session({
     secret: SESSION_SECRET as string,
     resave: false,
-    saveUninitialized: true, 
+    saveUninitialized: true,
     store: new SQLiteStore({ db: "sessions.db" }) as Store,
     name: "axis",
     cookie: {
@@ -37,6 +38,8 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRouter);
+app.use("/users", usersRouter);
+
 app.get("/ping", (req: Request, res: Response) => {
   res.send(`<html>
       <head>
