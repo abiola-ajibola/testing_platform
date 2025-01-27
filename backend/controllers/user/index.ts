@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { ICreateUser, TGetallUsersQuery, user } from "../../models/user";
+import { TGetallUsersQuery, user } from "../../models/user";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { isAuthenticated } from "../../middlewares/auth";
 import { isAdmin } from "../../middlewares/roles";
@@ -10,7 +10,6 @@ import {
 import { hashPassword } from "../../utils/crypto/password";
 import { validateBody, validateQuery } from "../../middlewares";
 import { getUsersValidationSchema } from "../../utils/validation/users";
-import { Role } from "../../constants";
 
 async function addUser(req: Request, res: Response) {
   try {

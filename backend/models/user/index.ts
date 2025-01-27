@@ -30,7 +30,6 @@ class User {
       perPage: 10,
     }
   ) {
-    console.log({ restFilters });
     const where = Object.entries(restFilters).reduce((acc, [key, value]) => {
       if (value) {
         return { ...acc, [key]: { contains: value } };
