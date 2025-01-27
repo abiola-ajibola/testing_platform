@@ -2,9 +2,8 @@ import { Request, Response, Router } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { validateBody, validateParams } from "../../middlewares";
 import {
-  createClassValidationSchema,
-  updateClassValidationSchema,
-} from "../../utils/validation/class";
+  createQuestionOptionValidationSchema, updateQuestionOptionValidationSchema
+} from "../../utils/validation/question_option";
 import { questionOption } from "../../models/question_option";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
 
@@ -26,7 +25,7 @@ async function getOne(req: Request, res: Response) {
   try {
     const _questionOption = await questionOption.getOne(+req.params.id);
     if (_questionOption) {
-      res.status(StatusCodes.CREATED).json({ message: ReasonPhrases.CREATED});
+      res.status(StatusCodes.CREATED).json({ message: ReasonPhrases.CREATED });
     }
   } catch (error) {
     console.log({ error });
@@ -68,22 +67,14 @@ async function deleteOne(req: Request, res: Response) {
 }
 
 const router = Router();
-router.post("/", validateBody(createClassValidationSchema), create);
-router.get(
-  "/:id",
-  validateParams(idParamValidationSchema),
-  getOne
-);
+router.post("/", validateBody(createQuestionOptionValidationSchema), create);
+router.get("/:id", validateParams(idParamValidationSchema), getOne);
 router.patch(
   "/:id",
   validateParams(idParamValidationSchema),
-  validateBody(updateClassValidationSchema),
+  validateBody(updateQuestionOptionValidationSchema),
   updateOne
 );
-router.delete(
-  "/:id",
-  validateParams(idParamValidationSchema),
-  deleteOne
-);
+router.delete("/:id", validateParams(idParamValidationSchema), deleteOne);
 
-export const question_optionRouter = router
+export const question_optionRouter = router;
