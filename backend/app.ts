@@ -4,6 +4,11 @@ import session, { Store } from "express-session";
 import StoreInitiator from "connect-sqlite3";
 import { authRouter } from "./controllers/auth";
 import { usersRouter } from "./controllers/user";
+import { classRouter } from "./controllers/class";
+import { questionRouter } from "./controllers/question";
+import { question_optionRouter } from "./controllers/question_option";
+import { subjectRouter } from "./controllers/subject";
+import { testRouter } from "./controllers/test";
 
 declare module "express-session" {
   interface Session {
@@ -39,6 +44,11 @@ app.use(express.json());
 
 app.use("/auth", authRouter);
 app.use("/users", usersRouter);
+app.use("/class", classRouter);
+app.use("/question", questionRouter);
+app.use("/question_option", question_optionRouter);
+app.use("/subject", subjectRouter);
+app.use("/test", testRouter);
 
 app.get("/ping", (req: Request, res: Response) => {
   res.send(`<html>
