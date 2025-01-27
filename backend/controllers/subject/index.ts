@@ -64,23 +64,23 @@ async function deleteOne(req: Request, res: Response) {
   }
 }
 
-const classRouter = Router();
-classRouter.post("/", validateBody(createSubjectValidationSchema), create);
-classRouter.get(
+const subjectRouter = Router();
+subjectRouter.post("/", validateBody(createSubjectValidationSchema), create);
+subjectRouter.get(
   "/:id",
   validateParams(idParamValidationSchema),
   getOne
 );
-classRouter.patch(
+subjectRouter.patch(
   "/:id",
   validateParams(idParamValidationSchema),
   validateBody(updateSubjectValidationSchema),
   updateOne
 );
-classRouter.delete(
+subjectRouter.delete(
   "/:id",
   validateParams(idParamValidationSchema),
   deleteOne
 );
 
-export { classRouter };
+export { subjectRouter };
