@@ -23,6 +23,12 @@ class User {
       where: { id },
     });
   }
+  
+  async getByUsername(username: string) {
+    return await prisma.user.findUnique({
+      where: { username },
+    });
+  }
 
   async getAll(
     { page = 1, perPage = 10, ...restFilters }: TGetallUsersQuery = {

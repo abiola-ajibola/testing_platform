@@ -12,7 +12,7 @@ import { validateBody } from "../../middlewares";
 
 async function signup(req: Request, res: Response) {
   try {
-    const existingUser = await user.getOne(req.body.username);
+    const existingUser = await user.getByUsername(req.body.username);
     if (existingUser) {
       res.status(StatusCodes.CONFLICT).json({ message: "User already exists" });
       return;
