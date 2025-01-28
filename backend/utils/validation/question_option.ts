@@ -2,7 +2,7 @@ import { number, object, string } from "yup";
 
 export const createQuestionOptionValidationSchema = object({
   text: string().required("Write an actaul option"),
-  image_url: number().nullable(),
+  image_url: string().nullable(),
   questionId: string().required("Question ID is required"),
 });
 

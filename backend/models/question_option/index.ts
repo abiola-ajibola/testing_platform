@@ -5,6 +5,7 @@ export interface ICreateQuestionOption {
   text: string;
   image_url: string;
   questionId: number;
+  correct?: boolean;
 }
 
 export type TGetallQuestionOptionsQuery = Partial<
