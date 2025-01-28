@@ -51,8 +51,8 @@ model Question_Option {
   id              Int       @id @default(autoincrement())
   text            String
   image_url       String?
-  Question        Question? @relation("CorrectOption")
-  QuestionOptions Question? @relation("QuestionOptions", fields: [questionId], references: [id])
+  correct         Boolean @default(false)
+  QuestionOptions Question? @relation("QuestionOptions", fields: [questionId], references: [id], onDelete: Cascade)
   questionId      Int?
   createdAt       DateTime  @default(now())
   lastModified    DateTime  @updatedAt
@@ -63,8 +63,6 @@ model Question {
   text                String
   Subject             Subject           @relation(fields: [subjectId], references: [id])
   subjectId           Int
-  correctOption       Question_Option   @relation("CorrectOption", fields: [correctOptionId], references: [id])
-  correctOptionId     Int               @unique
   options             Question_Option[] @relation("QuestionOptions")
   Test                Test[]
   explanation         String?
