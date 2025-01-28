@@ -60,7 +60,8 @@ model Question_Option {
 
 model Question {
   id                  Int               @id @default(autoincrement())
-  subject             Subject           @relation(fields: [subjectId], references: [id])
+  text                String
+  Subject             Subject           @relation(fields: [subjectId], references: [id])
   subjectId           Int
   correctOption       Question_Option   @relation("CorrectOption", fields: [correctOptionId], references: [id])
   correctOptionId     Int               @unique
