@@ -1,14 +1,22 @@
 import { Request, Response, Router } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
-import { validateBody, validateParams } from "../../middlewares";
+import { validateBody, validateParams, validateQuery } from "../../middlewares";
 import {
   createQuestionValidationSchema,
+  getAllValidationSchema,
   updateQuestionValidationSchema,
 } from "../../utils/validation/question";
-import { question } from "../../models/question";
+import {
+  ICreateQuestion,
+  question,
+  TGetallQuestionsQuery,
+} from "../../models/question";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
 
-async function create(req: Request, res: Response) {
+async function create(
+  req: Request<Object, Object, ICreateQuestion>,
+  res: Response
+) {
   try {
     const _question = await question.createOne(req.body);
     if (_question) {
@@ -26,7 +34,27 @@ async function getOne(req: Request, res: Response) {
   try {
     const _question = await question.getOne(+req.params.id);
     if (_question) {
-      res.status(StatusCodes.CREATED).json({ message: ReasonPhrases.CREATED });
+      res.status(StatusCodes.OK).json({ data: _question });
+    }
+  } catch (error) {
+    console.log({ error });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+  }
+}
+
+async function getMany(
+  req: Request<Object, Object, Object, TGetallQuestionsQuery>,
+  res: Response
+) {
+  try {
+    const _question = await question.getAll({
+      ...req.query,
+      subjectId: req.query.subjectId && +req.query.subjectId,
+    });
+    if (_question) {
+      res.status(StatusCodes.OK).json({ data: _question });
     }
   } catch (error) {
     console.log({ error });
@@ -69,6 +97,7 @@ async function deleteOne(req: Request, res: Response) {
 
 const router = Router();
 router.post("/", validateBody(createQuestionValidationSchema), create);
+router.get("/", validateQuery(getAllValidationSchema), getMany);
 router.get("/:id", validateParams(idParamValidationSchema), getOne);
 router.patch(
   "/:id",
