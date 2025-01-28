@@ -14,7 +14,7 @@ import {
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
 
 async function create(
-  req: Request<Object, Object, ICreateQuestion>,
+  req: Request<object, object, ICreateQuestion>,
   res: Response
 ) {
   try {
@@ -45,7 +45,7 @@ async function getOne(req: Request, res: Response) {
 }
 
 async function getMany(
-  req: Request<Object, Object, Object, TGetallQuestionsQuery>,
+  req: Request<object, object, object, TGetallQuestionsQuery>,
   res: Response
 ) {
   try {

@@ -1,4 +1,3 @@
-import { Role } from "../../constants";
 import { prisma } from "../../services/db";
 
 export interface ICreateQuestion {
