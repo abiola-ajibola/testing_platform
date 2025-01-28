@@ -7,10 +7,11 @@
   "scripts": {
     "start": "node build/app.js",
     "build": "tsc",
-    "dev": "nodemon -e ts --exclude build/ --exec 'tsc && node build/app.js --envfile=.env'"
+    "dev": "nodemon -e ts --exclude build/ --exec 'tsc && node build/app.js --envfile=.env'",
+    "prisma": "prisma"
   },
   "dependencies": {
-    "@prisma/client": "^6.1.0",
+    "@prisma/client": "^6.2.1",
     "bcrypt": "^5.1.1",
     "connect-sqlite3": "^0.9.15",
     "cors": "^2.8.5",
@@ -29,7 +30,7 @@
     "@types/http-status-codes": "^1.2.0",
     "@types/node": "^22",
     "nodemon": "^3.1.9",
-    "prisma": "^6.1.0",
+    "prisma": "^6.2.1",
     "typescript": "^5.7.2"
   }
 }
