@@ -19,4 +19,26 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
 )
 Input.displayName = "Input"
 
+const InputGroup = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & { helperText?: string; inputProps?: React.ComponentProps<"input">; error?: boolean }
+>(({ className, helperText, inputProps, error, ...props }, ref) => {
+  return (
+    <div className={cn("flex flex-col space-y-1", className)} ref={ref} {...props}>
+      <Input
+        {...inputProps}
+        className={cn(inputProps?.className, error ? "border-red-500" : "")}
+      />
+      {helperText && (
+        <span className={cn("text-xs", error ? "text-red-500" : "text-muted-foreground")}>
+          {helperText}
+        </span>
+      )}
+    </div>
+  )
+})
+InputGroup.displayName = "InputGroup"
+
+export { InputGroup }
+
 export { Input }
