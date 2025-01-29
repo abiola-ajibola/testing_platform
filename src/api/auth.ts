@@ -25,8 +25,34 @@ export async function login(request: LoginRequest): Promise<LoginResponse> {
     );
     return response.data;
   } catch (error) {
-    console.error("Login request failed", error);
-    toast.error("Login request failed. Please try again.");
+    const er = error as AxiosError;
+    console.error("Login request failed", er?.response?.data);
+    toast.error(
+      er.status === 401
+        ? "Username or password incorrect"
+        : "Login request failed. Please try again."
+    );
+    throw error;
+  }
+}
+
+export async function me() {
+  try {
+    const response = await apiClient.get<LoginResponse>("/auth/me");
+    return response.data;
+  } catch (error) {
+    console.error("Me request failed", error);
+    // toast.error("Please login");
+    throw error;
+  }
+}
+
+export async function logout() {
+  try {
+    const response = await apiClient.get("/auth/logout");
+    return response.data;
+  } catch (error) {
+    console.error("Logout request failed", error);
     throw error;
   }
 }
