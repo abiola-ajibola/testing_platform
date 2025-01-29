@@ -12,7 +12,17 @@ import { testRouter } from "./controllers/test";
 
 declare module "express-session" {
   interface Session {
-    user: any;
+    user: {
+      id: number;
+      username: string;
+      first_name: string;
+      middle_name: string | null;
+      last_name: string;
+      password: null;
+      role: string;
+      createdAt: Date;
+      lastModified: Date;
+  }| null;
   }
 }
 
