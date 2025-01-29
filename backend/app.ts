@@ -40,6 +40,7 @@ app.use(
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(express.static("static"));
 // app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRouter);
@@ -49,6 +50,10 @@ app.use("/question", questionRouter);
 app.use("/question_option", question_optionRouter);
 app.use("/subject", subjectRouter);
 app.use("/test", testRouter);
+
+app.get("*", (req: Request, res: Response) => {
+  res.sendFile("index.html", { root: "frontend" });
+});
 
 app.get("/ping", (req: Request, res: Response) => {
   res.send(`<html>

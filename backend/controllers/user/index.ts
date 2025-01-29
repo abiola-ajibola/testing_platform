@@ -26,7 +26,10 @@ async function addUser(req: Request, res: Response) {
   }
 }
 
-async function getUsers(req: Request, res: Response) {
+async function getUsers(
+  req: Request<object, object, object, TGetallUsersQuery>,
+  res: Response
+) {
   const {
     first_name,
     last_name,
@@ -35,7 +38,7 @@ async function getUsers(req: Request, res: Response) {
     perPage,
     role,
     username,
-  }: TGetallUsersQuery = req.query as any;
+  }: TGetallUsersQuery = req.query;
   console.log({
     first_name,
     last_name,
@@ -116,7 +119,7 @@ async function deleteUser(req: Request, res: Response) {
       .status(StatusCodes.BAD_REQUEST)
       .json({ message: ReasonPhrases.BAD_REQUEST });
   }
-  if (req.session.user.id === req.params.id) {
+  if (req.session.user?.id === +req.params.id) {
     res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: "Cannot delete self using this approach" });
