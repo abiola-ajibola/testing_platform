@@ -142,7 +142,7 @@ async function changePassword(req: Request, res: Response) {
 }
 
 async function me(req: Request, res: Response) {
-  res.status(StatusCodes.OK).json({ data: req.session.user });
+  res.status(StatusCodes.OK).json({ data: {...req.session.user, password: undefined} });
 }
 
 const authRouter = Router();
