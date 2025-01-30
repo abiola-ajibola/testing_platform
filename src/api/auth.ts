@@ -16,7 +16,7 @@ export interface IUser {
   role: "ADMIN" | "STUDENT";
 }
 
-interface LoginResponse extends IUser {
+export interface LoginResponse extends IUser {
   createdAt: string;
   lastModified: string;
 }
