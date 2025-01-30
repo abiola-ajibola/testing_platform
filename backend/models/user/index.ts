@@ -75,6 +75,22 @@ class User {
       where: { id },
     });
   }
+
+  async getCount(restFilters?: ICreateUser) {
+    const where = Object.entries(restFilters || {}).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          return { ...acc, [key]: { contains: value } };
+        }
+        return acc;
+      },
+      {}
+    );
+    const total = await prisma.user.count({ where });
+    return {
+      count: total,
+    };
+  }
 }
 
 export const user = new User();

@@ -9,3 +9,7 @@ export const updateClassValidationSchema = object({
   name: string().nullable(),
   description: string().nullable(),
 });
+
+export const updateClassQueryValidationSchema = object({
+  name: string().nullable(),
+});

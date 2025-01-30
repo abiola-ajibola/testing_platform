@@ -104,6 +104,22 @@ class Question {
       where: { id },
     });
   }
+
+  async getCount(restFilters?: ICreateQuestion) {
+    const where = Object.entries(restFilters || {}).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          return { ...acc, [key]: { contains: value } };
+        }
+        return acc;
+      },
+      {}
+    );
+    const total = await prisma.question.count({ where });
+    return {
+      count: total,
+    };
+  }
 }
 
 export const question = new Question();

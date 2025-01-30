@@ -4,9 +4,13 @@ import { classModel } from "../../models/class";
 import { validateBody, validateParams, validateQuery } from "../../middlewares";
 import {
   createClassValidationSchema,
+  updateClassQueryValidationSchema,
   updateClassValidationSchema,
 } from "../../utils/validation/class";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
+import { isAuthenticated } from "../../middlewares/auth";
+import { isAdmin } from "../../middlewares/roles";
+import { getCount } from "../baseControllers";
 
 async function createClass(req: Request, res: Response) {
   try {
@@ -67,13 +71,18 @@ async function deleteClass(req: Request, res: Response) {
   }
 }
 
+const getClassesCount = getCount(classModel.getCount);
+
 const classRouter = Router();
+classRouter.use(isAuthenticated, isAdmin);
+
 classRouter.post("/", validateBody(createClassValidationSchema), createClass);
 classRouter.get(
-  "/:id",
-  validateParams(idParamValidationSchema),
-  getClass
+  "/count",
+  validateQuery(updateClassQueryValidationSchema),
+  getClassesCount
 );
+classRouter.get("/:id", validateParams(idParamValidationSchema), getClass);
 classRouter.patch(
   "/:id",
   validateParams(idParamValidationSchema),

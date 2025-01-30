@@ -12,6 +12,7 @@ import {
   TGetallQuestionsQuery,
 } from "../../models/question";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
+import { getCount } from "../baseControllers";
 
 async function create(
   req: Request<object, object, ICreateQuestion>,
@@ -95,9 +96,12 @@ async function deleteOne(req: Request, res: Response) {
   }
 }
 
+const getQuestionsCount = getCount(question.getCount);
+
 const router = Router();
 router.post("/", validateBody(createQuestionValidationSchema), create);
 router.get("/", validateQuery(getAllValidationSchema), getMany);
+router.get("/count", getQuestionsCount);
 router.get("/:id", validateParams(idParamValidationSchema), getOne);
 router.patch(
   "/:id",

@@ -3,7 +3,11 @@ import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { validateBody, validateParams } from "../../middlewares";
 import { subject } from "../../models/subject";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
-import { createSubjectValidationSchema, updateSubjectValidationSchema } from "../../utils/validation/subject";
+import {
+  createSubjectValidationSchema,
+  updateSubjectValidationSchema,
+} from "../../utils/validation/subject";
+import { getCount } from "../baseControllers";
 
 async function create(req: Request, res: Response) {
   try {
@@ -23,7 +27,7 @@ async function getOne(req: Request, res: Response) {
   try {
     const _subject = await subject.getOne(+req.params.id);
     if (_subject) {
-      res.status(StatusCodes.CREATED).json({ message: ReasonPhrases.CREATED});
+      res.status(StatusCodes.CREATED).json({ message: ReasonPhrases.CREATED });
     }
   } catch (error) {
     console.log({ error });
@@ -64,13 +68,13 @@ async function deleteOne(req: Request, res: Response) {
   }
 }
 
+const getSubjectsCount = getCount(subject.getCount);
+
 const subjectRouter = Router();
 subjectRouter.post("/", validateBody(createSubjectValidationSchema), create);
-subjectRouter.get(
-  "/:id",
-  validateParams(idParamValidationSchema),
-  getOne
-);
+subjectRouter.get("/count", getSubjectsCount);
+
+subjectRouter.get("/:id", validateParams(idParamValidationSchema), getOne);
 subjectRouter.patch(
   "/:id",
   validateParams(idParamValidationSchema),

@@ -60,6 +60,22 @@ class Subject {
       where: { id },
     });
   }
+
+  async getCount(restFilters?: ICreateSubject) {
+    const where = Object.entries(restFilters || {}).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          return { ...acc, [key]: { contains: value } };
+        }
+        return acc;
+      },
+      {}
+    );
+    const total = await prisma.subject.count({ where });
+    return {
+      count: total,
+    };
+  }
 }
 
 export const subject = new Subject();

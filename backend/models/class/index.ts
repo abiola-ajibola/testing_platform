@@ -59,6 +59,22 @@ class Class {
       where: { id },
     });
   }
+
+  async getCount(restFilters?: ICreateClass) {
+    const where = Object.entries(restFilters || {}).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          return { ...acc, [key]: { contains: value } };
+        }
+        return acc;
+      },
+      {}
+    );
+    const total = await prisma.class.count({ where });
+    return {
+      count: total,
+    };
+  }
 }
 
 export const classModel = new Class();

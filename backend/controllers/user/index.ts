@@ -10,6 +10,7 @@ import {
 import { hashPassword } from "../../utils/crypto/password";
 import { validateBody, validateQuery } from "../../middlewares";
 import { getUsersValidationSchema } from "../../utils/validation/users";
+import { getCount } from "../baseControllers";
 
 async function addUser(req: Request, res: Response) {
   try {
@@ -58,7 +59,7 @@ async function getUsers(
       role,
       username,
     });
-    res.status(StatusCodes.OK).json({ data: users });
+    res.status(StatusCodes.OK).json({ ...users });
   } catch (error) {
     console.log({ error });
     res
@@ -138,6 +139,8 @@ async function deleteUser(req: Request, res: Response) {
   }
 }
 
+const getUsersCount = getCount(user.getCount);
+
 const usersRouter = Router();
 
 usersRouter.use(isAuthenticated, isAdmin);
@@ -145,6 +148,7 @@ usersRouter.use(isAuthenticated, isAdmin);
 usersRouter.post("/", validateBody(signupValidationSchema), addUser);
 usersRouter.patch("/:id", updateUser);
 usersRouter.get("/", validateQuery(getUsersValidationSchema), getUsers);
+usersRouter.get("/count", getUsersCount);
 usersRouter.get("/:id", getOneUser);
 usersRouter.delete(
   "/:id",
