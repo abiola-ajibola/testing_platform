@@ -23,7 +23,7 @@ class User {
       where: { id },
     });
   }
-  
+
   async getByUsername(username: string) {
     return await prisma.user.findUnique({
       where: { username },
@@ -42,12 +42,18 @@ class User {
       }
       return acc;
     }, {});
-    return await prisma.user.findMany({
-      skip: page * perPage - perPage,
-      take: perPage,
-      where,
-      // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
-    });
+    const total = await prisma.user.count({ where });
+    return {
+      users: await prisma.user.findMany({
+        skip: page * perPage - perPage,
+        take: perPage,
+        where,
+        // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
   }
 
   async getOneWithPassword(username: string) {
