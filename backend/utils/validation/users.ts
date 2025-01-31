@@ -1,4 +1,4 @@
-import { number, object, ref, string } from "yup";
+import { number, object, string } from "yup";
 import { Role } from "../../constants";
 
 export const getUsersValidationSchema = object({
