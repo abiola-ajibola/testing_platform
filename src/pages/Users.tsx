@@ -1,0 +1,636 @@
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DataTable } from "@/components/ui/dataTable";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ColumnDef, Row, Table } from "@tanstack/react-table";
+import { Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Link } from "react-router-dom";
+
+interface IUser {
+  id: number;
+  username: string;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  role: "ADMIN" | "STUDENT";
+}
+
+const sampleData: IUser[] = [
+  {
+    id: 1,
+    username: "johndoe",
+    first_name: "John",
+    middle_name: "Michael",
+    last_name: "Doe",
+    role: "STUDENT",
+  },
+  {
+    id: 2,
+    username: "janedoe",
+    first_name: "Jane",
+    middle_name: "Marie",
+    last_name: "Doe",
+    role: "ADMIN",
+  },
+  {
+    id: 3,
+    username: "alice",
+    first_name: "Alice",
+    middle_name: "Ann",
+    last_name: "Smith",
+    role: "STUDENT",
+  },
+  {
+    id: 4,
+    username: "bob",
+    first_name: "Bob",
+    middle_name: "Benjamin",
+    last_name: "Brown",
+    role: "ADMIN",
+  },
+  {
+    id: 5,
+    username: "charlie",
+    first_name: "Charlie",
+    middle_name: "Christopher",
+    last_name: "Davis",
+    role: "STUDENT",
+  },
+  {
+    id: 6,
+    username: "david",
+    first_name: "David",
+    middle_name: "Daniel",
+    last_name: "Evans",
+    role: "ADMIN",
+  },
+  {
+    id: 7,
+    username: "eve",
+    first_name: "Eve",
+    middle_name: "Elizabeth",
+    last_name: "Wilson",
+    role: "STUDENT",
+  },
+  {
+    id: 8,
+    username: "frank",
+    first_name: "Frank",
+    middle_name: "Frederick",
+    last_name: "Garcia",
+    role: "ADMIN",
+  },
+  {
+    id: 9,
+    username: "grace",
+    first_name: "Grace",
+    middle_name: "Gabrielle",
+    last_name: "Martinez",
+    role: "STUDENT",
+  },
+  {
+    id: 10,
+    username: "henry",
+    first_name: "Henry",
+    middle_name: "Harrison",
+    last_name: "Lopez",
+    role: "ADMIN",
+  },
+];
+
+// const sampleData: IUser[] = [
+//   {
+//     id: 1,
+//     username: "johndoe",
+//     first_name: "John",
+//     middle_name: "Michael",
+//     last_name: "Doe",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 2,
+//     username: "janedoe",
+//     first_name: "Jane",
+//     middle_name: "Marie",
+//     last_name: "Doe",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 3,
+//     username: "alice",
+//     first_name: "Alice",
+//     middle_name: "Ann",
+//     last_name: "Smith",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 4,
+//     username: "bob",
+//     first_name: "Bob",
+//     middle_name: "Benjamin",
+//     last_name: "Brown",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 5,
+//     username: "charlie",
+//     first_name: "Charlie",
+//     middle_name: "Christopher",
+//     last_name: "Davis",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 6,
+//     username: "david",
+//     first_name: "David",
+//     middle_name: "Daniel",
+//     last_name: "Evans",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 7,
+//     username: "eve",
+//     first_name: "Eve",
+//     middle_name: "Elizabeth",
+//     last_name: "Wilson",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 8,
+//     username: "frank",
+//     first_name: "Frank",
+//     middle_name: "Frederick",
+//     last_name: "Garcia",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 9,
+//     username: "grace",
+//     first_name: "Grace",
+//     middle_name: "Gabrielle",
+//     last_name: "Martinez",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 10,
+//     username: "henry",
+//     first_name: "Henry",
+//     middle_name: "Harrison",
+//     last_name: "Lopez",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 11,
+//     username: "fin",
+//     first_name: "Finny",
+//     middle_name: "French",
+//     last_name: "Fried",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 12,
+//     username: "george",
+//     first_name: "George",
+//     middle_name: "Gregory",
+//     last_name: "Hill",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 13,
+//     username: "hannah",
+//     first_name: "Hannah",
+//     middle_name: "Helen",
+//     last_name: "Scott",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 14,
+//     username: "ian",
+//     first_name: "Ian",
+//     middle_name: "Isaac",
+//     last_name: "Adams",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 15,
+//     username: "julia",
+//     first_name: "Julia",
+//     middle_name: "Jane",
+//     last_name: "Baker",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 16,
+//     username: "kevin",
+//     first_name: "Kevin",
+//     middle_name: "Kyle",
+//     last_name: "Carter",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 17,
+//     username: "laura",
+//     first_name: "Laura",
+//     middle_name: "Lynn",
+//     last_name: "Mitchell",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 18,
+//     username: "michael",
+//     first_name: "Michael",
+//     middle_name: "Matthew",
+//     last_name: "Perez",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 19,
+//     username: "nina",
+//     first_name: "Nina",
+//     middle_name: "Nicole",
+//     last_name: "Roberts",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 20,
+//     username: "oliver",
+//     first_name: "Oliver",
+//     middle_name: "Oscar",
+//     last_name: "Turner",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 21,
+//     username: "paul",
+//     first_name: "Paul",
+//     middle_name: "Patrick",
+//     last_name: "Walker",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 22,
+//     username: "quincy",
+//     first_name: "Quincy",
+//     middle_name: "Quinn",
+//     last_name: "Young",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 23,
+//     username: "rachel",
+//     first_name: "Rachel",
+//     middle_name: "Rose",
+//     last_name: "King",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 24,
+//     username: "sam",
+//     first_name: "Sam",
+//     middle_name: "Samuel",
+//     last_name: "Wright",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 25,
+//     username: "tina",
+//     first_name: "Tina",
+//     middle_name: "Theresa",
+//     last_name: "Scott",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 26,
+//     username: "ursula",
+//     first_name: "Ursula",
+//     middle_name: "Uma",
+//     last_name: "Green",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 27,
+//     username: "victor",
+//     first_name: "Victor",
+//     middle_name: "Vincent",
+//     last_name: "Hall",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 28,
+//     username: "wendy",
+//     first_name: "Wendy",
+//     middle_name: "Willow",
+//     last_name: "Allen",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 29,
+//     username: "xander",
+//     first_name: "Xander",
+//     middle_name: "Xavier",
+//     last_name: "Young",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 30,
+//     username: "yara",
+//     first_name: "Yara",
+//     middle_name: "Yvonne",
+//     last_name: "Harris",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 31,
+//     username: "zach",
+//     first_name: "Zach",
+//     middle_name: "Zane",
+//     last_name: "Clark",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 32,
+//     username: "adam",
+//     first_name: "Adam",
+//     middle_name: "Aaron",
+//     last_name: "Lewis",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 33,
+//     username: "bella",
+//     first_name: "Bella",
+//     middle_name: "Beatrice",
+//     last_name: "Robinson",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 34,
+//     username: "chris",
+//     first_name: "Chris",
+//     middle_name: "Charles",
+//     last_name: "Walker",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 35,
+//     username: "diana",
+//     first_name: "Diana",
+//     middle_name: "Daisy",
+//     last_name: "King",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 36,
+//     username: "edward",
+//     first_name: "Edward",
+//     middle_name: "Ethan",
+//     last_name: "Wright",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 37,
+//     username: "fiona",
+//     first_name: "Fiona",
+//     middle_name: "Faith",
+//     last_name: "Scott",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 38,
+//     username: "george",
+//     first_name: "George",
+//     middle_name: "Gregory",
+//     last_name: "Green",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 39,
+//     username: "hannah",
+//     first_name: "Hannah",
+//     middle_name: "Helen",
+//     last_name: "Hall",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 40,
+//     username: "ian",
+//     first_name: "Ian",
+//     middle_name: "Isaac",
+//     last_name: "Allen",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 41,
+//     username: "julia",
+//     first_name: "Julia",
+//     middle_name: "Jane",
+//     last_name: "Young",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 42,
+//     username: "kevin",
+//     first_name: "Kevin",
+//     middle_name: "Kyle",
+//     last_name: "Harris",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 43,
+//     username: "laura",
+//     first_name: "Laura",
+//     middle_name: "Lynn",
+//     last_name: "Clark",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 44,
+//     username: "michael",
+//     first_name: "Michael",
+//     middle_name: "Matthew",
+//     last_name: "Lewis",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 45,
+//     username: "nina",
+//     first_name: "Nina",
+//     middle_name: "Nicole",
+//     last_name: "Robinson",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 46,
+//     username: "oliver",
+//     first_name: "Oliver",
+//     middle_name: "Oscar",
+//     last_name: "Walker",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 47,
+//     username: "paul",
+//     first_name: "Paul",
+//     middle_name: "Patrick",
+//     last_name: "King",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 48,
+//     username: "quincy",
+//     first_name: "Quincy",
+//     middle_name: "Quinn",
+//     last_name: "Wright",
+//     role: "STUDENT",
+//   },
+//   {
+//     id: 49,
+//     username: "rachel",
+//     first_name: "Rachel",
+//     middle_name: "Rose",
+//     last_name: "Scott",
+//     role: "ADMIN",
+//   },
+//   {
+//     id: 50,
+//     username: "sam",
+//     first_name: "Sam",
+//     middle_name: "Samuel",
+//     last_name: "Green",
+//     role: "STUDENT",
+//   },
+// ]; // replace this with actual data from the backend
+
+function handleSingleDelete(row: Row<IUser>) {
+  console.log({ id: row.getValue("id") });
+  row.toggleSelected(false);
+}
+
+const columns: ColumnDef<IUser>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "id",
+    enableHiding: false,
+    cell(props) {
+      return <div className="hidden">{props.row.getValue("id")}</div>;
+    },
+    header: () => {
+      return <div className="hidden">ID</div>;
+    },
+  },
+  {
+    accessorKey: "username",
+    header: "Username",
+    cell: ({ row }) => <div>{row.getValue("username")}</div>,
+    sortDescFirst: true,
+  },
+  {
+    accessorKey: "first_name",
+    header: "First name",
+    cell: ({ row }) => <div>{row.getValue("first_name")}</div>,
+  },
+  {
+    accessorKey: "middle_name",
+    header: "Middle name",
+    cell: ({ row }) => <div>{row.getValue("middle_name")}</div>,
+  },
+  {
+    accessorKey: "last_name",
+    header: "Last name",
+    cell: ({ row }) => <div>{row.getValue("last_name")}</div>,
+  },
+  {
+    accessorKey: "role",
+    header: () => <div>Role</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="font-medium">{row.getValue("role")}</div>
+      );
+    },
+    enableSorting: true,
+    enableColumnFilter: true,
+  },
+  {
+    id: "actions",
+    header: () => <div className="text-center mx-auto">Actions</div>,
+    enableHiding: false,
+    cell: ({ row }) => {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 p-0 w-full">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              <Link
+                className={`${buttonVariants({ variant: "default" })} w-full`}
+                to={`/_users/${row.getValue("id")}`}
+              >
+                Edit <Edit />
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Button
+                onClick={() => handleSingleDelete(row)}
+                variant="destructive"
+              >
+                Delete <Trash />
+              </Button>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];
+
+function handleMultiDelete(table: Table<IUser>) {
+  const model = table.getSelectedRowModel();
+  model.rows.forEach((row) => {
+    console.log({ row: row.getValue("id") });
+  });
+  table.resetRowSelection();
+}
+
+export function Users() {
+  return (
+    <div>
+      <h1>Users</h1>
+      <DataTable<IUser>
+        filter={"username"}
+        columns={columns}
+        data={sampleData}
+        handleDelete={handleMultiDelete}
+      />
+    </div>
+  );
+}
