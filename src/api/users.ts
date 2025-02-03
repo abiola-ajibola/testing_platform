@@ -1,14 +1,13 @@
 // import { AxiosError } from "axios";
-import { LoginResponse } from "./auth";
+import { IUser, LoginResponse } from "./auth";
 import apiClient from "./client";
 // import { toast } from "react-toastify";
-import { simpleGet } from "./baseClients";
-
-type ResponseWithPagination<T> = T & {
-  total: number;
-  perPage: number;
-  currentPage: number;
-};
+import {
+  ResponseWithPagination,
+  simpleGet,
+  simplePatch,
+  simplePost,
+} from "./baseClients";
 
 async function getMany() {
   try {
@@ -25,4 +24,15 @@ async function getMany() {
 export const users = {
   getMany,
   getCount: () => simpleGet<{ count: number }>("/users/count"),
+  get: (id: number) => simpleGet<LoginResponse>(`/users/${id}`),
+  create: (data: Omit<IUser, "id">) =>
+    simplePost<Omit<IUser, "id">, { message: string }>("/users", data),
+  update: (
+    id: number,
+    data: Partial<Omit<IUser & { _classes: number[] }, "id">>
+  ) =>
+    simplePatch<Partial<Omit<IUser, "id">>, { message: string }>(
+      `/users/${id}`,
+      data
+    ),
 };
