@@ -16,6 +16,8 @@ import { subject } from "./api/subject";
 import { question } from "./api/question";
 import { Users } from "./pages/Users";
 import { EditUser } from "./pages/EditUsers";
+import { Classes } from "./pages/Classes";
+import { EditClass } from "./pages/EditClasses";
 
 async function dashboardLoader() {
   return {
@@ -35,6 +37,15 @@ async function userLoader({ params }: { params: Params<string> }) {
     : null;
 }
 
+async function classesLoader() {
+  return await classes.getMany();
+}
+
+async function editClassLoader({ params }: { params: Params<string> }) {
+  return params.id && !Number.isNaN(+params.id)
+    ? classes.get(+params.id)
+    : null;
+}
 export type DashboardData = Awaited<ReturnType<typeof dashboardLoader>>;
 
 const router = createBrowserRouter([
@@ -73,8 +84,18 @@ const router = createBrowserRouter([
       },
       {
         path: "_classes",
-        element: <h1>Classes</h1>,
-        loader: dashboardLoader,
+        element: <Classes />,
+        loader: classesLoader,
+      },
+      {
+        path: "_classes/:id",
+        element: <EditClass />,
+        loader: editClassLoader,
+      },
+      {
+        path: "_classes/view/:id",
+        element: <EditClass />,
+        loader: editClassLoader,
       },
       {
         path: "_subjects",
