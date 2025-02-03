@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
-import { classModel } from "../../models/class";
+import { classModel, TGetallClassesQuery } from "../../models/class";
 import { validateBody, validateParams, validateQuery } from "../../middlewares";
 import {
   createClassValidationSchema,
@@ -30,8 +30,29 @@ async function getClass(req: Request, res: Response) {
   try {
     const _class = await classModel.getOne(+req.params.id);
     if (_class) {
-      res.status(StatusCodes.CREATED).json({ message: "Class created" });
+      res.status(StatusCodes.OK).json({ data: _class });
     }
+  } catch (error) {
+    console.log({ error });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+  }
+}
+
+async function getMany(
+  req: Request<object, object, object, TGetallClassesQuery>,
+  res: Response
+) {
+  const { name, description, page, perPage }: TGetallClassesQuery = req.query;
+  try {
+    const classes = await classModel.getAll({
+      description,
+      name,
+      page,
+      perPage,
+    });
+    res.status(StatusCodes.OK).json({ data: classes });
   } catch (error) {
     console.log({ error });
     res
@@ -82,6 +103,7 @@ classRouter.get(
   validateQuery(updateClassQueryValidationSchema),
   getClassesCount
 );
+classRouter.get("/", validateParams(updateClassValidationSchema), getMany);
 classRouter.get("/:id", validateParams(idParamValidationSchema), getClass);
 classRouter.patch(
   "/:id",

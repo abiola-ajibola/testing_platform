@@ -1,4 +1,3 @@
-import { Role } from "../../constants";
 import { prisma } from "../../services/db";
 
 export interface ICreateClass {
@@ -6,11 +5,10 @@ export interface ICreateClass {
   description: string;
 }
 
-export type TGetallUsersQuery = Partial<
+export type TGetallClassesQuery = Partial<
   ICreateClass & {
     page: number;
     perPage: number;
-    role: Role;
   }
 >;
 
@@ -22,7 +20,7 @@ class Class {
   }
 
   async getAll(
-    { page = 1, perPage = 10, ...restFilters }: TGetallUsersQuery = {
+    { page = 1, perPage = 10, ...restFilters }: TGetallClassesQuery = {
       page: 1,
       perPage: 10,
     }
@@ -33,12 +31,17 @@ class Class {
       }
       return acc;
     }, {});
-    return await prisma.class.findMany({
-      skip: page * perPage - perPage,
-      take: perPage,
-      where,
-      // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
-    });
+    const total = await prisma.class.count({ where });
+    return {
+      classes: await prisma.class.findMany({
+        skip: page * perPage - perPage,
+        take: perPage,
+        where,
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
   }
 
   async createOne(data: ICreateClass) {

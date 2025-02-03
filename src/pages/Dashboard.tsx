@@ -4,31 +4,30 @@ import { Link, useLoaderData } from "react-router-dom";
 
 export function Dashboard() {
   const data = useLoaderData<DashboardData>();
-  console.log(data);
   const stats = [
     {
       label: "Users",
       count: data.users.count,
       icon: <User size={48} />,
-      to: "/users",
+      to: "/_users",
     },
     {
       label: "Classes",
       count: data.classes.count,
       icon: <Boxes size={48} />,
-      to: "/classes",
+      to: "/_classes",
     },
     {
       label: "Subjects",
       count: data.subject.count,
       icon: <Book size={48} />,
-      to: "/subjects",
+      to: "/_subjects",
     },
     {
       label: "Questions",
       count: data.question.count,
       icon: <FileQuestion size={48} />,
-      to: "/questions",
+      to: "/_questions",
     },
   ];
   return (

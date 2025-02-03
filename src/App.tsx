@@ -1,5 +1,6 @@
 import {
   createBrowserRouter,
+  Params,
   redirect,
   RouterProvider,
 } from "react-router-dom";
@@ -13,7 +14,10 @@ import { users } from "./api/users";
 import { classes } from "./api/classes";
 import { subject } from "./api/subject";
 import { question } from "./api/question";
-
+import { Users } from "./pages/Users";
+import { EditUser } from "./pages/EditUsers";
+import { Classes } from "./pages/Classes";
+import { EditClass } from "./pages/EditClasses";
 
 async function dashboardLoader() {
   return {
@@ -23,7 +27,26 @@ async function dashboardLoader() {
     question: await question.getCount(),
   };
 }
-export type DashboardData = Awaited<ReturnType<typeof dashboardLoader>>
+
+async function userLoader({ params }: { params: Params<string> }) {
+  return params.id && !Number.isNaN(+params.id)
+    ? {
+        user: await users.get(+params.id),
+        classes: await classes.getMany(),
+      }
+    : null;
+}
+
+async function classesLoader() {
+  return await classes.getMany();
+}
+
+async function editClassLoader({ params }: { params: Params<string> }) {
+  return params.id && !Number.isNaN(+params.id)
+    ? classes.get(+params.id)
+    : null;
+}
+export type DashboardData = Awaited<ReturnType<typeof dashboardLoader>>;
 
 const router = createBrowserRouter([
   {
@@ -40,6 +63,48 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <Dashboard />,
+        loader: dashboardLoader,
+      },
+      {
+        path: "_users",
+        element: <Users />,
+        loader: async () => {
+          return await users.getMany();
+        },
+      },
+      {
+        path: "_users/view/:id",
+        element: <EditUser />,
+        loader: userLoader,
+      },
+      {
+        path: "_users/:id",
+        element: <EditUser />,
+        loader: userLoader,
+      },
+      {
+        path: "_classes",
+        element: <Classes />,
+        loader: classesLoader,
+      },
+      {
+        path: "_classes/:id",
+        element: <EditClass />,
+        loader: editClassLoader,
+      },
+      {
+        path: "_classes/view/:id",
+        element: <EditClass />,
+        loader: editClassLoader,
+      },
+      {
+        path: "_subjects",
+        element: <h1>Subjects</h1>,
+        loader: dashboardLoader,
+      },
+      {
+        path: "_questions",
+        element: <h1>Questions</h1>,
         loader: dashboardLoader,
       },
     ],

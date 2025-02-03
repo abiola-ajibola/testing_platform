@@ -2,15 +2,15 @@ import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/contexts/auth";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { LogOut, Users, Boxes, Book, FileQuestion } from "lucide-react";
+import { LogOut, Users, Boxes, Book, FileQuestion, Home } from "lucide-react";
 import { toast } from "react-toastify";
 import { logout, me } from "@/api/auth";
 
 const navItems = [
-  { to: "/users", icon: Users, label: "Users" },
-  { to: "/profile", icon: Boxes, label: "Classes" },
-  { to: "/settings", icon: Book, label: "Subjects" },
-  { to: "/questions", icon: FileQuestion, label: "Questions" },
+  { to: "/_users", icon: Users, label: "Users" },
+  { to: "/_classes", icon: Boxes, label: "Classes" },
+  { to: "/_subjects", icon: Book, label: "Subjects" },
+  { to: "/_questions", icon: FileQuestion, label: "Questions" },
   { to: window.location.pathname, icon: LogOut, label: "Logout" },
 ];
 
@@ -58,17 +58,16 @@ const Layout = () => {
         >
           {isSidebarOpen ? "←" : "→"}
         </Button>
-        <h2
-          className={`text-xl font-bold text-gray-800 ${
-            !isSidebarOpen && "hidden"
-          }`}
-        >
-          <Link to="/dashboard">Dashboard</Link>
+        <h2 className={`text-xl font-bold text-gray-800`}>
+          <Link className="flex items-center" to="/dashboard">
+            <Home className="mr-2" size={40} />{" "}
+            {isSidebarOpen && <span>Dashboard</span>}
+          </Link>
         </h2>
-        <ul className="mt-4">
-          <div className={isSidebarOpen ? "md:block" : "hidden md:block"}>
+        <ul className="mt-4 h-full">
+          <div className={`md:flex flex-col h-full ${isSidebarOpen ? "" : "hidden"}`}>
             {navItems.map(({ to, icon: Icon, label }) => (
-              <li className="my-6" key={label}>
+              <li className="my-4 last:mt-auto" key={label}>
                 <Link
                   to={to}
                   className="text-gray-600 hover:text-gray-900 flex items-center"

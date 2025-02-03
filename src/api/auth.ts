@@ -1,6 +1,7 @@
 import apiClient from "@/api/client";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import { ClassResponse } from "./classes";
 
 interface LoginRequest {
   username: string;
@@ -12,11 +13,13 @@ export interface IUser {
   username: string;
   first_name: string;
   middle_name: string;
+  password?: string;
   last_name: string;
+  classes?: ClassResponse[] | number [] ;
   role: "ADMIN" | "STUDENT";
 }
 
-export interface LoginResponse extends IUser {
+export interface LoginResponse extends Omit<IUser, "password"> {
   createdAt: string;
   lastModified: string;
 }
