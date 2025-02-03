@@ -1,5 +1,6 @@
 import {
   createBrowserRouter,
+  Params,
   redirect,
   RouterProvider,
 } from "react-router-dom";
@@ -24,6 +25,16 @@ async function dashboardLoader() {
     question: await question.getCount(),
   };
 }
+
+async function userLoader({ params }: { params: Params<string> }) {
+  return params.id && !Number.isNaN(+params.id)
+    ? {
+        user: await users.get(+params.id),
+        classes: await classes.getMany(),
+      }
+    : null;
+}
+
 export type DashboardData = Awaited<ReturnType<typeof dashboardLoader>>;
 
 const router = createBrowserRouter([
@@ -46,12 +57,19 @@ const router = createBrowserRouter([
       {
         path: "_users",
         element: <Users />,
-        loader: dashboardLoader,
+        loader: async () => {
+          return await users.getMany();
+        },
+      },
+      {
+        path: "_users/view/:id",
+        element: <EditUser />,
+        loader: userLoader,
       },
       {
         path: "_users/:id",
-        element:<EditUser  />,
-        loader: dashboardLoader,
+        element: <EditUser />,
+        loader: userLoader,
       },
       {
         path: "_classes",
