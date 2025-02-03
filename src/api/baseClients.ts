@@ -20,6 +20,19 @@ export async function simpleGet<T, U = undefined>(url: string, query?: U) {
   }
 }
 
+export async function simpleDelete<T>(url: string, id: number) {
+  try {
+    const response = await apiClient.delete<T>(url + "/" + id.toString());
+    toast.success("Deleted successfully");
+    return response.data;
+  } catch (error) {
+    const er = error as AxiosError<T>;
+    console.error(er);
+    toast.error(er.message);
+    throw error;
+  }
+}
+
 export async function simplePost<DataType, ResponseType>(
   url: string,
   data: DataType
