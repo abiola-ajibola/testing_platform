@@ -40,15 +40,6 @@ async function getUsers(
     role,
     username,
   }: TGetallUsersQuery = req.query;
-  console.log({
-    first_name,
-    last_name,
-    middle_name,
-    page,
-    perPage,
-    role,
-    username,
-  });
   try {
     const users = await user.getAll({
       first_name,
