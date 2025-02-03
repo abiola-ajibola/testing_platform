@@ -1,4 +1,3 @@
-import { Role } from "../../constants";
 import { prisma } from "../../services/db";
 
 export interface ICreateClass {
@@ -6,11 +5,10 @@ export interface ICreateClass {
   description: string;
 }
 
-export type TGetallUsersQuery = Partial<
+export type TGetallClassesQuery = Partial<
   ICreateClass & {
     page: number;
     perPage: number;
-    role: Role;
   }
 >;
 
@@ -22,7 +20,7 @@ class Class {
   }
 
   async getAll(
-    { page = 1, perPage = 10, ...restFilters }: TGetallUsersQuery = {
+    { page = 1, perPage = 10, ...restFilters }: TGetallClassesQuery = {
       page: 1,
       perPage: 10,
     }
