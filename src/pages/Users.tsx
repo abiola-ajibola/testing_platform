@@ -1,16 +1,11 @@
-import { LoginResponse } from "@/api/auth";import { ResponseWithPagination } from "@/api/baseClients";
-;
-import { Button, buttonVariants } from "@/components/ui/button";
+import { LoginResponse } from "@/api/auth";
+import { ResponseWithPagination } from "@/api/baseClients";
+import { buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/dataTable";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { TableActions } from "@/components/ui/tableActions";
 import { ColumnDef, Row, Table } from "@tanstack/react-table";
-import { Edit, Eye, MoreHorizontal, Plus, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link, useLoaderData } from "react-router-dom";
 
 interface IUser {
@@ -96,40 +91,11 @@ const columns: ColumnDef<IUser>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 p-0 w-full">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Link
-                className={`${buttonVariants({ variant: "default" })} w-full`}
-                to={`/_users/view/${row.getValue("id")}`}
-              >
-                View <Eye />
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link
-                className={`${buttonVariants({ variant: "default" })} w-full`}
-                to={`/_users/${row.getValue("id")}`}
-              >
-                Edit <Edit />
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Button
-                onClick={() => handleSingleDelete(row)}
-                variant="destructive"
-              >
-                Delete <Trash />
-              </Button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <TableActions<IUser>
+          row={row}
+          baseUrl="_users"
+          onDelete={handleSingleDelete}
+        />
       );
     },
   },
