@@ -4,6 +4,7 @@ import apiClient from "./client";
 // import { toast } from "react-toastify";
 import {
   ResponseWithPagination,
+  simpleDelete,
   simpleGet,
   simplePatch,
   simplePost,
@@ -35,4 +36,5 @@ export const users = {
       `/users/${id}`,
       data
     ),
+  delete: (id: number) => simpleDelete<{ message: string }>(`/users`, id),
 };

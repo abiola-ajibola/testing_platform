@@ -1,11 +1,13 @@
 import { LoginResponse } from "@/api/auth";
 import { ResponseWithPagination } from "@/api/baseClients";
+import { users as client } from "@/api/users";
 import { buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/dataTable";
 import { TableActions } from "@/components/ui/tableActions";
 import { ColumnDef, Row, Table } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { Link, useLoaderData } from "react-router-dom";
 
 interface IUser {
@@ -17,101 +19,125 @@ interface IUser {
   role: "ADMIN" | "STUDENT";
 }
 
-function handleSingleDelete(row: Row<IUser>) {
-  console.log({ id: row.getValue("id") });
-  row.toggleSelected(false);
-}
-
-const columns: ColumnDef<IUser>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "id",
-    enableHiding: false,
-    cell(props) {
-      return <div className="hidden">{props.row.getValue("id")}</div>;
-    },
-    header: () => {
-      return <div className="hidden">ID</div>;
-    },
-  },
-  {
-    accessorKey: "username",
-    header: "Username",
-    cell: ({ row }) => <div>{row.getValue("username")}</div>,
-    sortDescFirst: true,
-  },
-  {
-    accessorKey: "first_name",
-    header: "First name",
-    cell: ({ row }) => <div>{row.getValue("first_name")}</div>,
-  },
-  {
-    accessorKey: "middle_name",
-    header: "Middle name",
-    cell: ({ row }) => <div>{row.getValue("middle_name")}</div>,
-  },
-  {
-    accessorKey: "last_name",
-    header: "Last name",
-    cell: ({ row }) => <div>{row.getValue("last_name")}</div>,
-  },
-  {
-    accessorKey: "role",
-    header: () => <div>Role</div>,
-    cell: ({ row }) => {
-      return <div className="font-medium">{row.getValue("role")}</div>;
-    },
-    enableSorting: true,
-    enableColumnFilter: true,
-  },
-  {
-    id: "actions",
-    header: () => <div className="text-center mx-auto">Actions</div>,
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <TableActions<IUser>
-          row={row}
-          baseUrl="_users"
-          onDelete={handleSingleDelete}
-        />
-      );
-    },
-  },
-];
-
-function handleMultiDelete(table: Table<IUser>) {
-  const model = table.getSelectedRowModel();
-  model.rows.forEach((row) => {
-    console.log({ row: row.getValue("id") });
-  });
-  table.resetRowSelection();
-}
-
 export function Users() {
-  const { users, perPage, total } =
+  const [userData, setUserData] = useState<ResponseWithPagination<{
+    users: LoginResponse[];
+  }> | null>(null);
+
+  const loadedData =
     useLoaderData<ResponseWithPagination<{ users: LoginResponse[] }>>();
+
+  const { users, perPage, total } = userData || loadedData || {};
+
+  const handleMultiDelete = useCallback(() => {
+    return async function (table: Table<IUser>) {
+      const model = table.getSelectedRowModel();
+      await Promise.all(
+        model.rows.map(async (row) => {
+          console.log({ row: row.getValue("id") });
+          return await client.delete(row.getValue("id"));
+        })
+      );
+      table.resetRowSelection();
+      const data = await client.getMany();
+      console.log({ data });
+      setUserData(data);
+    };
+  }, []);
+
+  async function handleSingleDelete(row: Row<IUser>) {
+    console.log({ id: row.getValue("id") });
+    row.toggleSelected(false);
+    await client.delete(row.getValue("id"));
+    const data = await client.getMany();
+    console.log({ data });
+    setUserData(data);
+  }
+
+  const columns: ColumnDef<IUser>[] = useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: "id",
+        enableHiding: false,
+        cell(props) {
+          return <div className="hidden">{props.row.getValue("id")}</div>;
+        },
+        header: () => {
+          return <div className="hidden">ID</div>;
+        },
+      },
+      {
+        accessorKey: "username",
+        header: "Username",
+        cell: ({ row }) => <div>{row.getValue("username")}</div>,
+        sortDescFirst: true,
+      },
+      {
+        accessorKey: "first_name",
+        header: "First name",
+        cell: ({ row }) => <div>{row.getValue("first_name")}</div>,
+      },
+      {
+        accessorKey: "middle_name",
+        header: "Middle name",
+        cell: ({ row }) => <div>{row.getValue("middle_name")}</div>,
+      },
+      {
+        accessorKey: "last_name",
+        header: "Last name",
+        cell: ({ row }) => <div>{row.getValue("last_name")}</div>,
+      },
+      {
+        accessorKey: "role",
+        header: () => <div>Role</div>,
+        cell: ({ row }) => {
+          return <div className="font-medium">{row.getValue("role")}</div>;
+        },
+        enableSorting: true,
+        enableColumnFilter: true,
+      },
+      {
+        id: "actions",
+        header: () => <div className="text-center mx-auto">Actions</div>,
+        enableHiding: false,
+        cell: ({ row }) => {
+          return (
+            <TableActions<IUser>
+              row={row}
+              baseUrl="_users"
+              onDelete={handleSingleDelete}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
+
   return (
     <div>
       <div className="flex justify-between">
@@ -124,7 +150,7 @@ export function Users() {
         filter={"username"}
         columns={columns}
         data={users}
-        handleDelete={handleMultiDelete}
+        handleDelete={handleMultiDelete()}
         pageCount={total / perPage > 0 ? Math.ceil(total / perPage) : 1}
       />
     </div>

@@ -46,11 +46,11 @@ const selectOptions = [
 export function EditUser() {
   const loaderData = useLoaderData<{
     user: { data: Omit<IUser, "password"> | null };
-    classes: { data: ResponseWithPagination<ClassResponse[]> };
+    classes: { data: ResponseWithPagination<{ classes: ClassResponse[] }> };
   }>();
 
   const user = loaderData?.user.data;
-  const _classes = loaderData?.classes.data;
+  const _classes = loaderData?.classes.data.classes;
 
   const [selectedOption, setSelectedOption] = useState<
     (typeof selectOptions)[0] | null
@@ -253,12 +253,12 @@ export function EditUser() {
               // options={classes.map((c) => ({ value: c.id, label: c.name }))}
               loadOptions={async (inputValue) => {
                 const data = await classes.getMany({ name: inputValue });
-                return data.data.map((c: ClassResponse) => ({
+                return data.data.classes.map((c: ClassResponse) => ({
                   value: c.id,
                   label: c.name,
                 }));
               }}
-              defaultOptions={_classes.map((c) => ({
+              defaultOptions={_classes?.map((c) => ({
                 value: c.id,
                 label: c.name,
               }))}
