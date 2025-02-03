@@ -31,12 +31,17 @@ class Class {
       }
       return acc;
     }, {});
-    return await prisma.class.findMany({
-      skip: page * perPage - perPage,
-      take: perPage,
-      where,
-      // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
-    });
+    const total = await prisma.class.count({ where });
+    return {
+      classes: await prisma.class.findMany({
+        skip: page * perPage - perPage,
+        take: perPage,
+        where,
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
   }
 
   async createOne(data: ICreateClass) {
