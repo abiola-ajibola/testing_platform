@@ -7,6 +7,7 @@ export interface ICreateUser {
   first_name: string;
   last_name: string;
   middle_name: string;
+  _classes?: number[];
 }
 
 export type TGetallUsersQuery = Partial<
@@ -21,6 +22,9 @@ class User {
   async getOne(id: number) {
     return await prisma.user.findUnique({
       where: { id },
+      include: {
+        classes: true,
+      },
     });
   }
 
@@ -48,6 +52,9 @@ class User {
         skip: page * perPage - perPage,
         take: perPage,
         where,
+        include: {
+          classes: true,
+        },
         // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
       }),
       total,
@@ -72,7 +79,16 @@ class User {
       where: {
         id: data.id,
       },
-      data: { ...data },
+      data: {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        middle_name: data.middle_name,
+        username: data.username,
+        password: data.password,
+        classes: {
+          connect: data._classes?.map((id) => ({ id })),
+        },
+      },
     });
   }
 
