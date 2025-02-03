@@ -172,11 +172,13 @@ export function DataTable<T>({
   data,
   columns,
   filter,
+  pageCount = 1,
   handleDelete,
 }: {
   data: T[];
   columns: ColumnDef<T>[];
   filter?: keyof T;
+  pageCount?: number;
   handleDelete?: (table: Table<T>) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -199,7 +201,7 @@ export function DataTable<T>({
     onRowSelectionChange: setRowSelection,
     onColumnOrderChange: setColumnOrder,
     onPaginationChange: setPagination,
-    pageCount: 5,
+    pageCount,
     state: {
       sorting,
       columnFilters,
@@ -288,14 +290,22 @@ export function DataTable<T>({
                               header.column.columnDef.header,
                               header.getContext()
                             )}
-                        {<span className="ml-1">
-                          {
-                            {
-                              desc: <ArrowUp size={16} /* className="absolute" */ />,
-                              asc: <ArrowDown size={16} /* className="absolute" */ />,
-                            }[header.column.getIsSorted() as string] ?? <span className="inline-block w-4"></span>
-                          }
-                        </span>}
+                        {
+                          <span className="ml-1">
+                            {{
+                              desc: (
+                                <ArrowUp size={16} /* className="absolute" */ />
+                              ),
+                              asc: (
+                                <ArrowDown
+                                  size={16} /* className="absolute" */
+                                />
+                              ),
+                            }[header.column.getIsSorted() as string] ?? (
+                              <span className="inline-block w-4"></span>
+                            )}
+                          </span>
+                        }
                       </div>
                     </TableHead>
                   );
