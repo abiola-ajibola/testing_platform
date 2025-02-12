@@ -111,7 +111,7 @@ export function Classes() {
   return (
     <div>
       <div className="flex justify-between">
-        <h1>Users</h1>
+        <h1>Classes</h1>
         <Link className={buttonVariants()} to="/_classes/new">
           Create Class <Plus />
         </Link>
