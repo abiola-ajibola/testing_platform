@@ -9,6 +9,7 @@ import { questionRouter } from "./controllers/question";
 import { question_optionRouter } from "./controllers/question_option";
 import { subjectRouter } from "./controllers/subject";
 import { testRouter } from "./controllers/test";
+import { staticRouter } from "./controllers/static";
 
 declare module "express-session" {
   interface Session {
@@ -22,7 +23,7 @@ declare module "express-session" {
       role: string;
       createdAt: Date;
       lastModified: Date;
-  }| null;
+    } | null;
   }
 }
 
@@ -60,6 +61,7 @@ app.use("/question", questionRouter);
 app.use("/question_option", question_optionRouter);
 app.use("/subject", subjectRouter);
 app.use("/test", testRouter);
+app.use("/static", staticRouter);
 
 app.get("*", (req: Request, res: Response) => {
   res.sendFile("index.html", { root: "frontend" });

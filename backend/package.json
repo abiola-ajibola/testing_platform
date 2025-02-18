@@ -18,6 +18,7 @@
     "express": "^4.21.2",
     "express-session": "1.18.0",
     "http-status-codes": "^2.3.0",
+    "multer": "^1.4.5-lts.1",
     "sqlite3": "^5.1.7",
     "yup": "^1.6.1"
   },
@@ -28,6 +29,7 @@
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.1",
     "@types/http-status-codes": "^1.2.0",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22",
     "nodemon": "^3.1.9",
     "prisma": "^6.2.1",
