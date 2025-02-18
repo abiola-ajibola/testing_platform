@@ -16,7 +16,7 @@ export async function simpleGet<T, U = undefined>(url: string, query?: U) {
     const er = error as AxiosError<T>;
     console.error(er);
     toast.error(er.message);
-    throw error;
+    // throw error;
   }
 }
 
@@ -29,7 +29,7 @@ export async function simpleDelete<T>(url: string, id: number) {
     const er = error as AxiosError<T>;
     console.error(er);
     toast.error(er.message);
-    throw error;
+    // throw error;
   }
 }
 
@@ -45,7 +45,7 @@ export async function simplePost<DataType, ResponseType>(
     const er = error as AxiosError<ResponseType>;
     console.error(er);
     toast.error(er.message);
-    throw error;
+    // throw error;
   }
 }
 

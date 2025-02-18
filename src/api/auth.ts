@@ -39,7 +39,7 @@ export async function login(request: LoginRequest): Promise<LoginResponse> {
         ? "Username or password incorrect"
         : "Login request failed. Please try again."
     );
-    throw error;
+    // throw error;
   }
 }
 
@@ -50,7 +50,7 @@ export async function me() {
   } catch (error) {
     console.error("Me request failed", error);
     // toast.error("Please login");
-    throw error;
+    // throw error;
   }
 }
 
@@ -60,6 +60,6 @@ export async function logout() {
     return response.data;
   } catch (error) {
     console.error("Logout request failed", error);
-    throw error;
+    // throw error;
   }
 }
