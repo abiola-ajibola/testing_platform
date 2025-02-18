@@ -13,6 +13,7 @@ import {
 } from "../../models/question";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
 import { getCount } from "../baseControllers";
+import { isAdmin } from "../../middlewares/roles";
 
 async function create(
   req: Request<object, object, ICreateQuestion>,
@@ -33,7 +34,7 @@ async function create(
 
 async function getOne(req: Request, res: Response) {
   try {
-    const _question = await question.getOne(+req.params.id);
+    const _question = await question.getOne(+req.params.id, false);
     if (_question) {
       res.status(StatusCodes.OK).json({ data: _question });
     }
@@ -99,6 +100,8 @@ async function deleteOne(req: Request, res: Response) {
 const getQuestionsCount = getCount(question.getCount);
 
 const router = Router();
+router.use(isAdmin);
+
 router.post("/", validateBody(createQuestionValidationSchema), create);
 router.get("/", validateQuery(getAllValidationSchema), getMany);
 router.get("/count", getQuestionsCount);

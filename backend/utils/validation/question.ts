@@ -19,12 +19,7 @@ export const getAllValidationSchema = object({
   perPage: number().nullable(),
   role: string().nullable(),
   text: string().nullable(),
-  subjectId: string()
-    .test("", "Please enter a valid subjectId", (value) => {
-      console.log({ value1: value });
-      return !!value && !isNaN(+value);
-    })
-    .nullable(),
+  subjectId: string().nullable(),
   explanation: string().nullable(),
   explanationImageUrl: string().nullable(),
 });
@@ -32,7 +27,7 @@ export const getAllValidationSchema = object({
 export const updateQuestionValidationSchema = object({
   subjectId: string().nullable(),
   correctOptionId: string().nullable(),
-  explanation: number().nullable(),
+  explanation: string().nullable(),
   explanationImageUrl: string().nullable(),
   options: array(
     object({

@@ -20,6 +20,9 @@ import { Classes } from "./pages/Classes";
 import { EditClass } from "./pages/EditClasses";
 import { Subjects } from "./pages/Subjects";
 import { EditSubject } from "./pages/EditSubjects";
+import { Questions } from "./pages/Questions";
+import { EditQuestion } from "./pages/EditQuestions";
+import { AdminGuard } from "./components/AdminGuard";
 
 async function dashboardLoader() {
   return {
@@ -47,6 +50,10 @@ async function subjectsLoader() {
   return await subject.getMany();
 }
 
+async function questionsLoader() {
+  return await question.getMany();
+}
+
 async function editClassLoader({ params }: { params: Params<string> }) {
   return params.id && !Number.isNaN(+params.id)
     ? classes.get(+params.id)
@@ -56,9 +63,15 @@ async function editClassLoader({ params }: { params: Params<string> }) {
 async function editSubjectLoader({ params }: { params: Params<string> }) {
   return params.id && !Number.isNaN(+params.id)
     ? {
-        subject: (await subject.get(+params.id)).data,
-        classes: (await classes.getMany()).data.classes,
+        subject: (await subject.get(+params.id))?.data,
+        classes: (await classes.getMany())?.data.classes,
       }
+    : null;
+}
+
+async function editQuestionLoader({ params }: { params: Params<string> }) {
+  return params.id && !Number.isNaN(+params.id)
+    ? question.get(+params.id)
     : null;
 }
 
@@ -70,68 +83,88 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "",
-        element: <></>,
-        loader: async () => {
-          return redirect("/dashboard");
-        },
+        path: "student",
+        element: <>Student Area</>,
       },
       {
-        path: "dashboard",
-        element: <Dashboard />,
-        loader: dashboardLoader,
-      },
-      {
-        path: "_users",
-        element: <Users />,
-        loader: async () => {
-          return await users.getMany();
-        },
-      },
-      {
-        path: "_users/view/:id",
-        element: <EditUser />,
-        loader: userLoader,
-      },
-      {
-        path: "_users/:id",
-        element: <EditUser />,
-        loader: userLoader,
-      },
-      {
-        path: "_classes",
-        element: <Classes />,
-        loader: classesLoader,
-      },
-      {
-        path: "_classes/:id",
-        element: <EditClass />,
-        loader: editClassLoader,
-      },
-      {
-        path: "_classes/view/:id",
-        element: <EditClass />,
-        loader: editClassLoader,
-      },
-      {
-        path: "_subjects",
-        element: <Subjects />,
-        loader: subjectsLoader,
-      },
-      {
-        path: "_subjects/:id",
-        element: <EditSubject />,
-        loader: editSubjectLoader,
-      },
-      {
-        path: "_subjects/view/:id",
-        element: <EditSubject />,
-        loader: editSubjectLoader,
-      },
-      {
-        path: "_questions",
-        element: <h1>Questions</h1>,
-        loader: dashboardLoader,
+        path: "admin",
+        element: <AdminGuard />,
+        children: [
+          {
+            path: "",
+            element: <></>,
+            loader: async () => {
+              return redirect("/dashboard");
+            },
+          },
+          {
+            path: "dashboard",
+            element: <Dashboard />,
+            loader: dashboardLoader,
+          },
+          {
+            path: "_users",
+            element: <Users />,
+            loader: async () => {
+              return await users.getMany();
+            },
+          },
+          {
+            path: "_users/view/:id",
+            element: <EditUser />,
+            loader: userLoader,
+          },
+          {
+            path: "_users/:id",
+            element: <EditUser />,
+            loader: userLoader,
+          },
+          {
+            path: "_classes",
+            element: <Classes />,
+            loader: classesLoader,
+          },
+          {
+            path: "_classes/:id",
+            element: <EditClass />,
+            loader: editClassLoader,
+          },
+          {
+            path: "_classes/view/:id",
+            element: <EditClass />,
+            loader: editClassLoader,
+          },
+          {
+            path: "_subjects",
+            element: <Subjects />,
+            loader: subjectsLoader,
+          },
+          {
+            path: "_subjects/:id",
+            element: <EditSubject />,
+            loader: editSubjectLoader,
+          },
+          {
+            path: "_subjects/view/:id",
+            element: <EditSubject />,
+            loader: editSubjectLoader,
+          },
+          {
+            path: "_questions",
+            element: <Questions />,
+            loader: questionsLoader,
+          },
+          {
+            path: "_questions/:id",
+            element: <EditQuestion />,
+            loader: editQuestionLoader,
+          },
+          {
+            path: "_questions/view/:id",
+            element: <EditQuestion />,
+            loader: editQuestionLoader,
+          },
+        ],
       },
     ],
   },

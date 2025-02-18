@@ -21,13 +21,14 @@ export type TGetallQuestionsQuery = Partial<
 >;
 
 class Question {
-  async getOne(id: number) {
+  async getOne(id: number, omitCorrect = true) {
     return await prisma.question.findUnique({
       where: { id },
       include: {
         options: {
-          omit: { correct: true },
+          omit: { correct: omitCorrect },
         },
+        subject: true,
       },
     });
   }
@@ -48,17 +49,24 @@ class Question {
       }
       return acc;
     }, {});
-    return await prisma.question.findMany({
-      skip: page * perPage - perPage,
-      take: perPage,
-      where,
-      include: {
-        options: {
-          omit: { correct: true },
+    const total = await prisma.question.count({ where });
+    return {
+      questions: await prisma.question.findMany({
+        skip: page * perPage - perPage,
+        take: perPage,
+        where,
+        include: {
+          options: {
+            omit: { correct: true },
+          },
+          subject: true,
         },
-      },
-      // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
-    });
+        // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
   }
 
   async createOne(data: ICreateQuestion) {
@@ -71,7 +79,7 @@ class Question {
         options: {
           create: data.options,
         },
-        Subject: {
+        subject: {
           connect: {
             id: data.subjectId,
           },
@@ -91,7 +99,11 @@ class Question {
           ? {
               update: data.options.map((option) => ({
                 where: { id: option.id },
-                data: option,
+                data: {
+                  correct: option.correct,
+                  text: option.text,
+                  image_url: option.image_url,
+                },
               })),
             }
           : undefined,

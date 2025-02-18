@@ -26,8 +26,9 @@ const InputGroup = React.forwardRef<
     helperText?: string;
     inputProps?: React.ComponentProps<"input">;
     error?: boolean;
+    preview?: React.ReactNode;
   }
->(({ className, helperText, inputProps, error, ...props }, ref) => {
+>(({ className, helperText, inputProps, error, preview, ...props }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const togglePasswordVisibility = () => {
@@ -77,6 +78,7 @@ const InputGroup = React.forwardRef<
           {helperText}
         </span>
       )}
+      {preview && <div className="mt-2">{preview}</div>}
     </div>
   );
 });
