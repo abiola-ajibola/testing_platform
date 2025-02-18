@@ -8,6 +8,7 @@ import {
   updateSubjectValidationSchema,
 } from "../../utils/validation/subject";
 import { getCount } from "../baseControllers";
+import { isAdmin } from "../../middlewares/roles";
 
 async function create(req: Request, res: Response) {
   try {
@@ -41,7 +42,8 @@ async function getMany(
   req: Request<object, object, object, TGetallSubjectsQuery>,
   res: Response
 ) {
-  const { name, description, classId, page, perPage }: TGetallSubjectsQuery = req.query;
+  const { name, description, classId, page, perPage }: TGetallSubjectsQuery =
+    req.query;
   try {
     const classes = await subject.getAll({
       classId,
@@ -93,6 +95,8 @@ async function deleteOne(req: Request, res: Response) {
 const getSubjectsCount = getCount(subject.getCount);
 
 const subjectRouter = Router();
+subjectRouter.use(isAdmin);
+
 subjectRouter.post("/", validateBody(createSubjectValidationSchema), create);
 subjectRouter.get("/count", getSubjectsCount);
 subjectRouter.get("/", validateQuery(updateSubjectValidationSchema), getMany);
