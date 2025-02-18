@@ -60,12 +60,13 @@ model Question_Option {
 model Question {
   id                  Int               @id @default(autoincrement())
   text                String
-  Subject             Subject           @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject             Subject           @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   subjectId           Int
   options             Question_Option[] @relation("QuestionOptions")
   Test                Test[]
   explanation         String?
   explanationImageUrl String?
+  imageUrl            String?
   createdAt           DateTime          @default(now())
   lastModified        DateTime          @updatedAt
 }
