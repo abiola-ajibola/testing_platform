@@ -53,7 +53,7 @@ export function EditClass() {
           });
     if (id === "new" && response) {
       reset();
-      navigate("/_classes");
+      navigate("/admin/_classes");
     }
   };
 

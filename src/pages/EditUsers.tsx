@@ -116,7 +116,7 @@ export function EditUser() {
           });
     if (id === "new" && response) {
       reset();
-      navigate("/_users");
+      navigate("/admin/_users");
     }
   };
 
@@ -253,10 +253,10 @@ export function EditUser() {
               // options={classes.map((c) => ({ value: c.id, label: c.name }))}
               loadOptions={async (inputValue) => {
                 const data = await classes.getMany({ name: inputValue });
-                return data.data.classes.map((c: ClassResponse) => ({
+                return data?.data.classes.map((c: ClassResponse) => ({
                   value: c.id,
                   label: c.name,
-                }));
+                }))|| [];
               }}
               defaultOptions={_classes?.map((c) => ({
                 value: c.id,

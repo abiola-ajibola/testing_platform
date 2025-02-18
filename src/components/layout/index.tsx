@@ -7,10 +7,10 @@ import { toast } from "react-toastify";
 import { logout, me } from "@/api/auth";
 
 const navItems = [
-  { to: "/_users", icon: Users, label: "Users" },
-  { to: "/_classes", icon: Boxes, label: "Classes" },
-  { to: "/_subjects", icon: Book, label: "Subjects" },
-  { to: "/_questions", icon: FileQuestion, label: "Questions" },
+  { to: "/admin/_users", icon: Users, label: "Users" },
+  { to: "/admin/_classes", icon: Boxes, label: "Classes" },
+  { to: "/admin/_subjects", icon: Book, label: "Subjects" },
+  { to: "/admin/_questions", icon: FileQuestion, label: "Questions" },
   { to: window.location.pathname, icon: LogOut, label: "Logout" },
 ];
 
@@ -20,10 +20,16 @@ const Layout = () => {
   const navigate = useNavigate();
   useEffect(() => {
     (async () => {
-      const data = await me();
-      if (data) {
-        setData(data);
-      } else {
+      try {
+        const data = await me();
+        if (data) {
+          setData(data);
+        } else {
+          toast.error("Please login to continue");
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error(error);
         toast.error("Please login to continue");
         navigate("/login");
       }
@@ -59,13 +65,17 @@ const Layout = () => {
           {isSidebarOpen ? "←" : "→"}
         </Button>
         <h2 className={`text-xl font-bold text-gray-800`}>
-          <Link className="flex items-center" to="/dashboard">
+          <Link className="flex items-center" to="/admin/dashboard">
             <Home className="mr-2" size={40} />{" "}
             {isSidebarOpen && <span>Dashboard</span>}
           </Link>
         </h2>
         <ul className="mt-4 h-full">
-          <div className={`md:flex flex-col h-full ${isSidebarOpen ? "" : "hidden"}`}>
+          <div
+            className={`md:flex flex-col h-full ${
+              isSidebarOpen ? "" : "hidden"
+            }`}
+          >
             {navItems.map(({ to, icon: Icon, label }) => (
               <li className="my-4 last:mt-auto" key={label}>
                 <Link
@@ -81,16 +91,6 @@ const Layout = () => {
               </li>
             ))}
           </div>
-          {/* <li className="my-6">
-            <Link
-              to={window.location.pathname}
-              className="text-gray-600 hover:text-gray-900 flex items-center"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2" size={40} />
-              {isSidebarOpen && <span>Logout</span>}
-            </Link>
-          </li> */}
         </ul>
       </div>
 

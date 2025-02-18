@@ -39,7 +39,7 @@ export function LoginPage() {
     if (response) {
       // Redirect to dashboard
       setData(response);
-      navigate("/dashboard", { replace: true });
+      navigate("/admin/dashboard", { replace: true });
     }
   };
   return (

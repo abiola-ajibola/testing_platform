@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosProgressEvent } from "axios";
 import apiClient from "./client";
 import { toast } from "react-toastify";
 

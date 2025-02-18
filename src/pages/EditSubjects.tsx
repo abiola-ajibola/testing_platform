@@ -70,7 +70,7 @@ export function EditSubject() {
           });
     if (id === "new" && response) {
       reset();
-      navigate("/_subjects");
+      navigate("/admin/_subjects");
     }
   };
 
@@ -119,7 +119,7 @@ export function EditSubject() {
               cacheOptions
               loadOptions={async (inputValue) => {
                 const data = await classes.getMany({ name: inputValue });
-                const options = data.data.classes.map((c: ClassResponse) => ({
+                const options = data?.data.classes.map((c: ClassResponse) => ({
                   value: c.id,
                   label: c.name,
                 }));
