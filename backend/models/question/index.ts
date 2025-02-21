@@ -15,6 +15,9 @@ export interface ICreateQuestion {
 
 export type TGetallQuestionsQuery = Partial<
   ICreateQuestion & {
+    id: number;
+    ids: number[];
+    omitCorrect: boolean;
     page: number;
     perPage: number;
   }
@@ -33,14 +36,18 @@ class Question {
     });
   }
 
-  async getAll(
-    { page = 1, perPage = 10, ...restFilters }: TGetallQuestionsQuery = {
+  async getMany(
+    { page = 1, perPage = 10, omitCorrect = true, ...restFilters }: TGetallQuestionsQuery = {
       page: 1,
       perPage: 10,
+      omitCorrect: true,
     }
   ) {
     const where = Object.entries(restFilters).reduce((acc, [key, value]) => {
       if (value) {
+        if (key === "ids") {
+          return { ...acc, id: { in: value } };
+        }
         return {
           ...acc,
           [key]:
@@ -57,11 +64,36 @@ class Question {
         where,
         include: {
           options: {
-            omit: { correct: true },
+            omit: { correct: omitCorrect },
           },
           subject: true,
         },
         // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
+  }
+
+  async getBySubjectId(
+    { page = 1, perPage = 10, subjectId }: TGetallQuestionsQuery = {
+      page: 1,
+      perPage: 10,
+    }
+  ) {
+    const total = await prisma.question.count({ where: { subjectId } });
+    return {
+      questions: await prisma.question.findMany({
+        skip: page * perPage - perPage,
+        take: perPage,
+        where: { subjectId },
+        include: {
+          options: {
+            omit: { correct: true },
+          },
+          // subject: true,
+        },
       }),
       total,
       perPage,
