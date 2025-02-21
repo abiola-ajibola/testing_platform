@@ -41,7 +41,7 @@ export function Users() {
       table.resetRowSelection();
       const data = await client.getMany();
       console.log({ data });
-      setUserData(data);
+      setUserData(data ? data : null);
     };
   }, []);
 
@@ -51,7 +51,7 @@ export function Users() {
     await client.delete(row.getValue("id"));
     const data = await client.getMany();
     console.log({ data });
-    setUserData(data);
+    setUserData(data ? data : null);
   }
 
   const columns: ColumnDef<IUser>[] = useMemo(
@@ -128,7 +128,7 @@ export function Users() {
           return (
             <TableActions<IUser>
               row={row}
-              baseUrl="_users"
+              baseUrl="admin/_users"
               onDelete={handleSingleDelete}
             />
           );

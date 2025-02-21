@@ -33,7 +33,7 @@ export function Questions() {
       table.resetRowSelection();
       const data = await client.getMany();
       console.log({ data });
-      setQuestionssData(data);
+      setQuestionssData(data ? data : null);
     };
   }, []);
 
@@ -43,7 +43,7 @@ export function Questions() {
     await client.delete(row.getValue("id"));
     const data = await client.getMany();
     console.log({ data });
-    setQuestionssData(data);
+    setQuestionssData(data ? data : null);
   }
 
   const columns: ColumnDef<QuestionResponse>[] = useMemo(
@@ -98,7 +98,7 @@ export function Questions() {
           return (
             <TableActions<QuestionResponse>
               row={row}
-              baseUrl="_questions"
+              baseUrl="admin/_questions"
               onDelete={handleSingleDelete}
             />
           );
@@ -112,7 +112,7 @@ export function Questions() {
     <div>
       <div className="flex justify-between">
         <h1>Questions</h1>
-        <Link className={buttonVariants()} to="/_questions/new">
+        <Link className={buttonVariants()} to="/admin/_questions/new">
           Create Question <Plus />
         </Link>
       </div>

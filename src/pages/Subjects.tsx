@@ -34,7 +34,7 @@ export function Subjects() {
       table.resetRowSelection();
       const data = await client.getMany();
       console.log({ data });
-      setSubjectssData(data);
+      setSubjectssData(data? data : null);
     };
   }, []);
 
@@ -44,7 +44,7 @@ export function Subjects() {
     await client.delete(row.getValue("id"));
     const data = await client.getMany();
     console.log({ data });
-    setSubjectssData(data);
+    setSubjectssData(data? data : null);
   }
 
   const columns: ColumnDef<SubjectResponse>[] = useMemo(() => [
@@ -101,7 +101,7 @@ export function Subjects() {
         return (
           <TableActions<SubjectResponse>
             row={row}
-            baseUrl="_subjects"
+            baseUrl="admin/_subjects"
             onDelete={handleSingleDelete}
           />
         );

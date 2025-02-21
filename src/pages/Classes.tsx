@@ -33,7 +33,7 @@ export function Classes() {
       table.resetRowSelection();
       const data = await client.getMany();
       console.log({ data });
-      setClassesData(data);
+      setClassesData(data ? data : null);
     };
   }, []);
 
@@ -43,7 +43,7 @@ export function Classes() {
     await client.delete(row.getValue("id"));
     const data = await client.getMany();
     console.log({ data });
-    setClassesData(data);
+    setClassesData(data ? data : null);
   }
 
   const columns: ColumnDef<ClassResponse>[] = useMemo(() => [
@@ -100,7 +100,7 @@ export function Classes() {
         return (
           <TableActions<ClassResponse>
             row={row}
-            baseUrl="_classes"
+            baseUrl="admin/_classes"
             onDelete={handleSingleDelete}
           />
         );
