@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --config vite.production.config.ts",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "preview": "vite preview --config vite.production.config.ts",
     "tailwindcss": "tailwindcss"
   },
   "dependencies": {

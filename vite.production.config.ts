@@ -4,20 +4,8 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  server: {
-    origin: "http://localhost:8000",
-    cors: {
-      origin: "http://localhost:8000",
-    },
-  },
   build: {
-    modulePreload: {
-      polyfill: false,
-    },
-    manifest: true,
-    rollupOptions: {
-      input: path.resolve(__dirname, "./src/main.tsx"),
-    },
+    outDir: path.resolve(__dirname, "./backend/build/frontend"),
   },
   plugins: [react()],
   resolve: {
