@@ -22,6 +22,12 @@ export type SubjectResponse = ICreateSubject & {
 
 export const subject = {
   getCount: () => simpleGet<{ count: number }>("/subject/count"),
+  getUsersubjects: () =>
+    simpleGet<{
+      data: ResponseWithPagination<{
+        subjects: Omit<SubjectResponse, "class">[];
+      }>;
+    }>("/subject/user"),
   get: (id: number) => simpleGet<{ data: SubjectResponse }>(`/subject/${id}`),
   getMany: (query?: Partial<ICreateSubject>) =>
     simpleGet<

@@ -35,11 +35,14 @@ export async function simpleDelete<T>(url: string, id: number) {
 
 export async function simplePost<DataType, ResponseType>(
   url: string,
-  data: DataType
+  data: DataType,
+  config: { showSuccessToast?: boolean } = { showSuccessToast: true }
 ) {
   try {
     const response = await apiClient.post<ResponseType>(url, data);
-    toast.success("Created successfully");
+    if (config.showSuccessToast) {
+      toast.success("Created successfully");
+    }
     return response.data;
   } catch (error) {
     const er = error as AxiosError<ResponseType>;

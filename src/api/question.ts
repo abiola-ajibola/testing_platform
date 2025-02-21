@@ -32,8 +32,7 @@ export type QuestionResponse = ICreateQuestion & {
 
 export const question = {
   getCount: () => simpleGet<{ count: number }>("/question/count"),
-  get: (id: number) =>
-    simpleGet<{ data: QuestionResponse }>(`/question/${id}`),
+  get: (id: number) => simpleGet<{ data: QuestionResponse }>(`/question/${id}`),
   getMany: (query?: Partial<ICreateQuestion>) =>
     simpleGet<
       {
@@ -41,6 +40,11 @@ export const question = {
       },
       Partial<ICreateQuestion>
     >("/question", query),
+
+  getBySubjectID: (subjectId: string) =>
+    simpleGet<
+      ResponseWithPagination<{ data: { questions: QuestionResponse[] } }>
+    >(`/question/subject/${subjectId}`),
   create: (data: Omit<ICreateQuestion, "id">) =>
     simplePost<Omit<ICreateQuestion, "id">, { message: string }>(
       "/question",
@@ -55,7 +59,7 @@ export const question = {
   updloadImage: (
     file: File | Blob,
     body: { currentName: string } | null,
-    onUploadProgress?: (e: AxiosProgressEvent) => void,
+    onUploadProgress?: (e: AxiosProgressEvent) => void
   ) =>
     uploadFile<{ filename: string }>(
       "/static/upload",
@@ -63,4 +67,15 @@ export const question = {
       body,
       onUploadProgress
     ),
+  submitAnswers: (data: {
+    answers: ({ questionId: number; optionId: number } | null)[];
+    total: number;
+  }) =>
+    simplePost<
+      {
+        answers: ({ questionId: number; optionId: number } | null)[];
+        total: number;
+      },
+      { score: string }
+    >("/question/submit-answers", data, { showSuccessToast: false }),
 };
