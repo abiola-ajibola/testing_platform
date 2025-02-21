@@ -23,6 +23,24 @@ class Subject {
     });
   }
 
+  async getByClassId(
+    { page = 1, perPage = 10, classId }: TGetallSubjectsQuery = {
+      page: 1,
+      perPage: 10,
+    }
+  ) {
+    const where = { classId };
+    const total = await prisma.subject.count({ where });
+    return {
+      subjects: await prisma.subject.findMany({
+        where,
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
+  }
+
   async getAll(
     { page = 1, perPage = 10, ...restFilters }: TGetallSubjectsQuery = {
       page: 1,
