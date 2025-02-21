@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useUserContext } from "@/contexts/auth";
+import { USER_KEY, useUserContext } from "@/contexts/auth";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import {
@@ -50,7 +50,7 @@ const Layout = () => {
 
   const handleLogout = async () => {
     await logout();
-    localStorage.removeItem("user");
+    localStorage.removeItem(USER_KEY);
     setData({
       role: "STUDENT",
       id: 0,
