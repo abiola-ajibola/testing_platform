@@ -49,8 +49,9 @@ async function download(req: Request, res: Response) {
 
 const staticRouter = Router();
 staticRouter.use(static_("static"));
-staticRouter.use(isAdmin, isAuthenticated);
+staticRouter.use(isAuthenticated);
+
 staticRouter.get("/:id", download);
-staticRouter.post("/upload", upload);
+staticRouter.post("/upload", isAdmin, upload);
 
 export { staticRouter };
