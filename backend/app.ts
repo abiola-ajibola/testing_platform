@@ -10,20 +10,26 @@ import { question_optionRouter } from "./controllers/question_option";
 import { subjectRouter } from "./controllers/subject";
 import { testRouter } from "./controllers/test";
 import { staticRouter } from "./controllers/static";
+import { ICreateUser } from "./models/user";
 
 declare module "express-session" {
   interface Session {
-    user: {
-      id: number;
-      username: string;
-      first_name: string;
-      middle_name: string | null;
-      last_name: string;
-      password: null;
-      role: string;
-      createdAt: Date;
-      lastModified: Date;
-    } | null;
+    user:
+      | ({
+          id: number;
+          password: null;
+          classes?: {
+            id: number;
+            name: string;
+            description: string;
+            createdAt: Date;
+            lastModified: Date;
+          }[];
+          role: string;
+          createdAt: Date;
+          lastModified: Date;
+        } & Omit<ICreateUser, "password" | "_classes">)
+      | null;
   }
 }
 

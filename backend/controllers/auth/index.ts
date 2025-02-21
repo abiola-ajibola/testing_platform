@@ -20,7 +20,7 @@ async function signup(req: Request, res: Response) {
     const password = await hashPassword(req.body.password);
     const _user = await user.createOne({ ...req.body, password });
     // store user information in session
-    req.session.user = { ..._user, password: null };
+    req.session.user! = { ..._user, password: null };
 
     // save the session before sending response to ensure
     // session is saved before response is sent
@@ -68,7 +68,7 @@ async function login(req: Request, res: Response) {
         .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
       return;
     }
-
+    
     req.session.user = { ..._user, password: null };
     req.session.save(function (err) {
       if (err) {
@@ -142,7 +142,9 @@ async function changePassword(req: Request, res: Response) {
 }
 
 async function me(req: Request, res: Response) {
-  res.status(StatusCodes.OK).json({ data: {...req.session.user, password: undefined} });
+  res
+    .status(StatusCodes.OK)
+    .json({ data: { ...req.session.user, password: undefined } });
 }
 
 const authRouter = Router();
