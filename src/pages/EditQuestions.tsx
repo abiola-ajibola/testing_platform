@@ -393,10 +393,12 @@ export function EditQuestion() {
           >
             {errors.options.message}
           </div>
-          <Button type="submit">
-            {id === "new" ? "Create Question" : "Save"}
-          </Button>
         </>
+      )}
+      {!location.pathname.includes("view") && (
+        <Button type="submit">
+          {id === "new" ? "Create Question" : "Save"}
+        </Button>
       )}
     </form>
   );
