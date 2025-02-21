@@ -6,7 +6,7 @@ export interface ICreateUser {
   password: string;
   first_name: string;
   last_name: string;
-  middle_name: string;
+  middle_name: string | null;
   _classes?: number[];
 }
 
@@ -67,6 +67,9 @@ class User {
     return await prisma.user.findUnique({
       where: { username },
       omit: { password: false },
+      include: {
+        classes: true,
+      },
     });
   }
 
