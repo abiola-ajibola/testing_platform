@@ -12,6 +12,7 @@ import { testRouter } from "./controllers/test";
 import { staticRouter } from "./controllers/static";
 import { ICreateUser } from "./models/user";
 import { access, constants } from "fs";
+import { networkInterfaces } from "os";
 
 declare module "express-session" {
   interface Session {
@@ -101,5 +102,20 @@ app.get("/ping", (req: Request, res: Response) => {
 });
 
 app.listen(parseInt(PORT), () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`\nServer is running on port ${PORT}\n\n`);
+  const addresses = networkInterfaces();
+  for (const key in addresses) {
+    const address = addresses?.[key]?.find((addr) => addr.family === "IPv4");
+    if (address?.address === "127.0.0.1") {
+      console.log(
+        `Go to http://${address.address}:${PORT} in your browser to view the app`
+      );
+    }
+    if (address?.address && address?.address !== "127.0.0.1") {
+      console.log(
+        `Go to http://${address.address}:${PORT} on another device on your network to access the app`
+      );
+    }
+  }
+  console.log("\n\n");
 });
