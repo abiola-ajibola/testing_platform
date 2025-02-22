@@ -113,7 +113,7 @@ export function Subjects() {
     <div>
       <div className="flex justify-between">
         <h1>Subjects</h1>
-        <Link className={buttonVariants()} to="/_subjects/new">
+        <Link className={buttonVariants()} to="/admin/_subjects/new">
           Create Subject <Plus />
         </Link>
       </div>

@@ -142,7 +142,7 @@ export function Users() {
     <div>
       <div className="flex justify-between">
         <h1>Users</h1>
-        <Link className={buttonVariants()} to="/_users/new">
+        <Link className={buttonVariants()} to="/admin/_users/new">
           Create User <Plus />
         </Link>
       </div>
