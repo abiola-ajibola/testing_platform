@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL, // Set your API base URL
+    // baseURL: import.meta.env.VITE_API_BASE_URL, // Set your API base URL
     timeout: 10000, // Request timeout in milliseconds
     headers: {
         "Content-Type": "application/json", // Default content type
