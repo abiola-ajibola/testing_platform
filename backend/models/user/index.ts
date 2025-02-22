@@ -7,6 +7,7 @@ export interface ICreateUser {
   first_name: string;
   last_name: string;
   middle_name: string | null;
+  role?: Role;
   _classes?: number[];
 }
 
@@ -14,7 +15,6 @@ export type TGetallUsersQuery = Partial<
   Omit<ICreateUser, "password"> & {
     page: number;
     perPage: number;
-    role: Role;
   }
 >;
 
