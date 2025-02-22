@@ -10,7 +10,7 @@ import { useUserContext } from "@/contexts/auth";
 const passwordMatcher =
   import.meta.env.MODE === "development"
     ? /.*/
-    : /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,";:#^<>/\\])[A-Za-z\d@$!%*?&]{8,}/;
+    : /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,";:#^<>/\\])[A-Za-z\d@$!%*?&.,";:#^<>/\\]{8,}/;
 const schema = object({
   username: string().required("Username is required"),
   password: string()
