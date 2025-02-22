@@ -12,7 +12,8 @@
     "preview": "vite preview --config vite.production.config.ts",
     "tailwindcss": "tailwindcss",
     "build:all": "tsc -b && vite build --config vite.production.config.ts && cd backend && yarn build",
-    "start": "cd backend && yarn start"
+    "start": "cd backend && yarn start",
+    "install:all": "yarn && cd backend && yarn"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
