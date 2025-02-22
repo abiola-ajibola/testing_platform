@@ -7,27 +7,27 @@ export function Dashboard() {
   const stats = [
     {
       label: "Users",
-      count: data.users.count,
+      count: data.users?.count,
       icon: <User size={48} />,
-      to: "/_users",
+      to: "/admin/_users",
     },
     {
       label: "Classes",
-      count: data.classes.count,
+      count: data.classes?.count,
       icon: <Boxes size={48} />,
-      to: "/_classes",
+      to: "/admin/_classes",
     },
     {
       label: "Subjects",
-      count: data.subject.count,
+      count: data.subject?.count,
       icon: <Book size={48} />,
-      to: "/_subjects",
+      to: "/admin/_subjects",
     },
     {
       label: "Questions",
-      count: data.question.count,
+      count: data.question?.count,
       icon: <FileQuestion size={48} />,
-      to: "/_questions",
+      to: "/admin/_questions",
     },
   ];
   return (

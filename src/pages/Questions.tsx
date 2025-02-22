@@ -1,6 +1,5 @@
-import { LoginResponse } from "@/api/auth";
 import { ResponseWithPagination } from "@/api/baseClients";
-import { users as client } from "@/api/users";
+import { question as client, QuestionResponse } from "@/api/question";
 import { buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/dataTable";
@@ -10,27 +9,20 @@ import { Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { Link, useLoaderData } from "react-router-dom";
 
-interface IUser {
-  id: number;
-  username: string;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
-  role: "ADMIN" | "STUDENT";
-}
+export function Questions() {
+  const _questions = useLoaderData<{
+    data: ResponseWithPagination<{ questions: QuestionResponse[] }>;
+  }>();
 
-export function Users() {
-  const [userData, setUserData] = useState<ResponseWithPagination<{
-    users: LoginResponse[];
-  }> | null>(null);
+  const [questionsData, setQuestionssData] = useState<{
+    data: ResponseWithPagination<{ questions: QuestionResponse[] }>;
+  } | null>(null);
 
-  const loadedData =
-    useLoaderData<ResponseWithPagination<{ users: LoginResponse[] }>>();
-
-  const { users, perPage, total } = userData || loadedData || {};
+  const questions = questionsData?.data.questions || _questions.data.questions;
+  const { perPage, total } = questionsData?.data || _questions.data || {};
 
   const handleMultiDelete = useCallback(() => {
-    return async function (table: Table<IUser>) {
+    return async function (table: Table<QuestionResponse>) {
       const model = table.getSelectedRowModel();
       await Promise.all(
         model.rows.map(async (row) => {
@@ -41,20 +33,20 @@ export function Users() {
       table.resetRowSelection();
       const data = await client.getMany();
       console.log({ data });
-      setUserData(data ? data : null);
+      setQuestionssData(data ? data : null);
     };
   }, []);
 
-  async function handleSingleDelete(row: Row<IUser>) {
+  async function handleSingleDelete(row: Row<QuestionResponse>) {
     console.log({ id: row.getValue("id") });
     row.toggleSelected(false);
     await client.delete(row.getValue("id"));
     const data = await client.getMany();
     console.log({ data });
-    setUserData(data ? data : null);
+    setQuestionssData(data ? data : null);
   }
 
-  const columns: ColumnDef<IUser>[] = useMemo(
+  const columns: ColumnDef<QuestionResponse>[] = useMemo(
     () => [
       {
         id: "select",
@@ -84,41 +76,19 @@ export function Users() {
         accessorKey: "id",
         enableHiding: false,
         cell(props) {
-          return <div className="hidden">{props.row.getValue("id")}</div>;
+          return <div>{props.row.getValue("id")}</div>;
         },
         header: () => {
-          return <div className="hidden">ID</div>;
+          return <div>ID</div>;
         },
       },
       {
-        accessorKey: "username",
-        header: "Username",
-        cell: ({ row }) => <div>{row.getValue("username")}</div>,
+        accessorKey: "text",
+        header: "Preview",
+        cell: ({ row }) => (
+          <div>{(row.getValue("text") as string).substring(0, 25)}</div>
+        ),
         sortDescFirst: true,
-      },
-      {
-        accessorKey: "first_name",
-        header: "First name",
-        cell: ({ row }) => <div>{row.getValue("first_name")}</div>,
-      },
-      {
-        accessorKey: "middle_name",
-        header: "Middle name",
-        cell: ({ row }) => <div>{row.getValue("middle_name")}</div>,
-      },
-      {
-        accessorKey: "last_name",
-        header: "Last name",
-        cell: ({ row }) => <div>{row.getValue("last_name")}</div>,
-      },
-      {
-        accessorKey: "role",
-        header: () => <div>Role</div>,
-        cell: ({ row }) => {
-          return <div className="font-medium">{row.getValue("role")}</div>;
-        },
-        enableSorting: true,
-        enableColumnFilter: true,
       },
       {
         id: "actions",
@@ -126,9 +96,9 @@ export function Users() {
         enableHiding: false,
         cell: ({ row }) => {
           return (
-            <TableActions<IUser>
+            <TableActions<QuestionResponse>
               row={row}
-              baseUrl="admin/_users"
+              baseUrl="admin/_questions"
               onDelete={handleSingleDelete}
             />
           );
@@ -141,15 +111,15 @@ export function Users() {
   return (
     <div>
       <div className="flex justify-between">
-        <h1>Users</h1>
-        <Link className={buttonVariants()} to="/_users/new">
-          Create User <Plus />
+        <h1>Questions</h1>
+        <Link className={buttonVariants()} to="/admin/_questions/new">
+          Create Question <Plus />
         </Link>
       </div>
-      <DataTable<IUser>
-        filter={"username"}
+      <DataTable<QuestionResponse>
+        filter={"text"}
         columns={columns}
-        data={users}
+        data={questions}
         handleDelete={handleMultiDelete()}
         pageCount={total / perPage > 0 ? Math.ceil(total / perPage) : 1}
       />

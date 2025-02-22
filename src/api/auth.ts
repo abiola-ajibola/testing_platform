@@ -15,7 +15,7 @@ export interface IUser {
   middle_name: string;
   password?: string;
   last_name: string;
-  classes?: ClassResponse[] | number [] ;
+  classes?: ClassResponse[] | number[];
   role: "ADMIN" | "STUDENT";
 }
 
@@ -24,7 +24,9 @@ export interface LoginResponse extends Omit<IUser, "password"> {
   lastModified: string;
 }
 
-export async function login(request: LoginRequest): Promise<LoginResponse> {
+export async function login(
+  request: LoginRequest
+): Promise<LoginResponse | void> {
   try {
     const response = await apiClient.post<LoginResponse>(
       "/auth/login",
@@ -39,18 +41,18 @@ export async function login(request: LoginRequest): Promise<LoginResponse> {
         ? "Username or password incorrect"
         : "Login request failed. Please try again."
     );
-    throw error;
+    // throw error;
   }
 }
 
 export async function me() {
   try {
-    const response = await apiClient.get<LoginResponse>("/auth/me");
-    return response.data;
+    const response = await apiClient.get<{ data: LoginResponse }>("/auth/me");
+    return response.data.data;
   } catch (error) {
     console.error("Me request failed", error);
     // toast.error("Please login");
-    throw error;
+    // throw error;
   }
 }
 
@@ -60,6 +62,6 @@ export async function logout() {
     return response.data;
   } catch (error) {
     console.error("Logout request failed", error);
-    throw error;
+    // throw error;
   }
 }

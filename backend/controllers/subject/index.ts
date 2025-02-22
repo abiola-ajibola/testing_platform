@@ -1,13 +1,15 @@
 import { Request, Response, Router } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
-import { validateBody, validateParams } from "../../middlewares";
-import { subject } from "../../models/subject";
+import { validateBody, validateParams, validateQuery } from "../../middlewares";
+import { subject, TGetallSubjectsQuery } from "../../models/subject";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
 import {
   createSubjectValidationSchema,
   updateSubjectValidationSchema,
 } from "../../utils/validation/subject";
 import { getCount } from "../baseControllers";
+import { isAdmin } from "../../middlewares/roles";
+import { isAuthenticated } from "../../middlewares/auth";
 
 async function create(req: Request, res: Response) {
   try {
@@ -27,13 +29,58 @@ async function getOne(req: Request, res: Response) {
   try {
     const _subject = await subject.getOne(+req.params.id);
     if (_subject) {
-      res.status(StatusCodes.CREATED).json({ message: ReasonPhrases.CREATED });
+      res.status(StatusCodes.OK).json({ data: _subject });
     }
   } catch (error) {
     console.log({ error });
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+  }
+}
+
+async function getMany(
+  req: Request<object, object, object, TGetallSubjectsQuery>,
+  res: Response
+) {
+  const { name, description, classId, page, perPage }: TGetallSubjectsQuery =
+    req.query;
+  try {
+    const classes = await subject.getAll({
+      classId,
+      description,
+      name,
+      page,
+      perPage,
+    });
+    res.status(StatusCodes.OK).json({ data: classes });
+  } catch (error) {
+    console.log({ error });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+  }
+}
+
+async function getUsersSubjects(req: Request, res: Response) {
+  const user = req.session.user;
+  console.log({ user });
+  if (user) {
+    try {
+      const data = await subject.getByClassId({
+        classId: user.classes?.[0]?.id,
+      });
+      res.status(StatusCodes.OK).json({ data });
+    } catch (error) {
+      console.log({ error });
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+    }
+  } else {
+    res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: ReasonPhrases.UNAUTHORIZED });
   }
 }
 
@@ -71,18 +118,44 @@ async function deleteOne(req: Request, res: Response) {
 const getSubjectsCount = getCount(subject.getCount);
 
 const subjectRouter = Router();
-subjectRouter.post("/", validateBody(createSubjectValidationSchema), create);
-subjectRouter.get("/count", getSubjectsCount);
 
-subjectRouter.get("/:id", validateParams(idParamValidationSchema), getOne);
+subjectRouter.use(isAuthenticated);
+
+subjectRouter.post(
+  "/",
+  isAdmin,
+  validateBody(createSubjectValidationSchema),
+  create
+);
+
+subjectRouter.get("/count", isAdmin, getSubjectsCount);
+subjectRouter.get("/user", getUsersSubjects);
+
+subjectRouter.get(
+  "/",
+  isAdmin,
+  validateQuery(updateSubjectValidationSchema),
+  getMany
+);
+
+subjectRouter.get(
+  "/:id",
+  isAdmin,
+  validateParams(idParamValidationSchema),
+  getOne
+);
+
 subjectRouter.patch(
   "/:id",
+  isAdmin,
   validateParams(idParamValidationSchema),
   validateBody(updateSubjectValidationSchema),
   updateOne
 );
+
 subjectRouter.delete(
   "/:id",
+  isAdmin,
   validateParams(idParamValidationSchema),
   deleteOne
 );

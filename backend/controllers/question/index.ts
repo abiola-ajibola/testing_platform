@@ -13,6 +13,9 @@ import {
 } from "../../models/question";
 import { idParamValidationSchema } from "../../utils/validation/utilityValidations";
 import { getCount } from "../baseControllers";
+import { isAdmin } from "../../middlewares/roles";
+import { isAuthenticated } from "../../middlewares/auth";
+import { divide, format as mathFormat, multiply } from "mathjs";
 
 async function create(
   req: Request<object, object, ICreateQuestion>,
@@ -33,7 +36,7 @@ async function create(
 
 async function getOne(req: Request, res: Response) {
   try {
-    const _question = await question.getOne(+req.params.id);
+    const _question = await question.getOne(+req.params.id, false);
     if (_question) {
       res.status(StatusCodes.OK).json({ data: _question });
     }
@@ -50,12 +53,28 @@ async function getMany(
   res: Response
 ) {
   try {
-    const _question = await question.getAll({
+    const _question = await question.getMany({
       ...req.query,
       subjectId: req.query.subjectId && +req.query.subjectId,
     });
     if (_question) {
       res.status(StatusCodes.OK).json({ data: _question });
+    }
+  } catch (error) {
+    console.log({ error });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+  }
+}
+
+async function getQuestionsBySubjectID(req: Request, res: Response) {
+  try {
+    const _questions = await question.getBySubjectId({
+      subjectId: +req.params.subjectId,
+    });
+    if (_questions) {
+      res.status(StatusCodes.OK).json({ data: _questions });
     }
   } catch (error) {
     console.log({ error });
@@ -96,19 +115,62 @@ async function deleteOne(req: Request, res: Response) {
   }
 }
 
+async function submitAnswers(
+  req: Request<
+    object,
+    object,
+    {
+      answers: ({ questionId: number; optionId: number } | null)[];
+      total: number;
+    }
+  >,
+  res: Response
+) {
+  const answers = req.body.answers;
+  const total = req.body.total;
+  const questions = await question.getMany({
+    ids: answers.filter((a) => Boolean(a)).map((a) => a!.questionId),
+    omitCorrect: false,
+  });
+  const correctOptions = questions.questions.filter((q) =>
+    answers.find(
+      (a) =>
+        q.id == a?.questionId &&
+        q.options.find((o) => o.id === a?.optionId && o.correct)
+    )
+  );
+
+  const score =
+    mathFormat(multiply(divide(correctOptions.length, total), 100), {
+      precision: 2,
+    }) + "%";
+
+  res.status(StatusCodes.OK).json({ score });
+}
+
 const getQuestionsCount = getCount(question.getCount);
 
 const router = Router();
-router.post("/", validateBody(createQuestionValidationSchema), create);
-router.get("/", validateQuery(getAllValidationSchema), getMany);
-router.get("/count", getQuestionsCount);
-router.get("/:id", validateParams(idParamValidationSchema), getOne);
+router.use(isAuthenticated);
+
+router.post("/", isAdmin, validateBody(createQuestionValidationSchema), create);
+router.get("/", isAdmin, validateQuery(getAllValidationSchema), getMany);
+router.get("/count", isAdmin, getQuestionsCount);
+router.post("/submit-answers", submitAnswers);
+router.get("/subject/:subjectId", getQuestionsBySubjectID);
+router.get("/:id", isAdmin, validateParams(idParamValidationSchema), getOne);
 router.patch(
   "/:id",
+  isAdmin,
   validateParams(idParamValidationSchema),
   validateBody(updateQuestionValidationSchema),
   updateOne
 );
-router.delete("/:id", validateParams(idParamValidationSchema), deleteOne);
+router.delete(
+  "/:id",
+  isAdmin,
+  validateParams(idParamValidationSchema),
+  deleteOne
+);
 
 export const questionRouter = router;

@@ -1,5 +1,5 @@
 import { ResponseWithPagination } from "@/api/baseClients";
-import { classes as client, ClassResponse } from "@/api/classes";
+import { subject as client, SubjectResponse } from "@/api/subject";
 import { buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/dataTable";
@@ -9,20 +9,21 @@ import { Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { Link, useLoaderData } from "react-router-dom";
 
-export function Classes() {
-  const _classes = useLoaderData<{
-    data: ResponseWithPagination<{ classes: ClassResponse[] }>;
+
+export function Subjects() {
+  const _subjects = useLoaderData<{
+    data: ResponseWithPagination<{ subjects: SubjectResponse[] }>;
   }>();
 
-  const [classesData, setClassesData] = useState<{
-    data: ResponseWithPagination<{ classes: ClassResponse[] }>;
+  const [subjectsData, setSubjectssData] = useState<{
+    data: ResponseWithPagination<{ subjects: SubjectResponse[] }>;
   } | null>(null);
 
-  const classes = classesData?.data.classes || _classes.data.classes;
-  const { perPage, total } = classesData?.data || _classes.data || {};
+  const subjects = subjectsData?.data.subjects || _subjects.data.subjects;
+  const { perPage, total } = subjectsData?.data || _subjects.data || {};
 
   const handleMultiDelete = useCallback(() => {
-    return async function (table: Table<ClassResponse>) {
+    return async function (table: Table<SubjectResponse>) {
       const model = table.getSelectedRowModel();
       await Promise.all(
         model.rows.map(async (row) => {
@@ -33,20 +34,20 @@ export function Classes() {
       table.resetRowSelection();
       const data = await client.getMany();
       console.log({ data });
-      setClassesData(data ? data : null);
+      setSubjectssData(data? data : null);
     };
   }, []);
 
-  async function handleSingleDelete(row: Row<ClassResponse>) {
+  async function handleSingleDelete(row: Row<SubjectResponse>) {
     console.log({ id: row.getValue("id") });
     row.toggleSelected(false);
     await client.delete(row.getValue("id"));
     const data = await client.getMany();
     console.log({ data });
-    setClassesData(data ? data : null);
+    setSubjectssData(data? data : null);
   }
 
-  const columns: ColumnDef<ClassResponse>[] = useMemo(() => [
+  const columns: ColumnDef<SubjectResponse>[] = useMemo(() => [
     {
       id: "select",
       header: ({ table }) => (
@@ -98,9 +99,9 @@ export function Classes() {
       enableHiding: false,
       cell: ({ row }) => {
         return (
-          <TableActions<ClassResponse>
+          <TableActions<SubjectResponse>
             row={row}
-            baseUrl="admin/_classes"
+            baseUrl="admin/_subjects"
             onDelete={handleSingleDelete}
           />
         );
@@ -111,15 +112,15 @@ export function Classes() {
   return (
     <div>
       <div className="flex justify-between">
-        <h1>Classes</h1>
-        <Link className={buttonVariants()} to="/_classes/new">
-          Create Class <Plus />
+        <h1>Subjects</h1>
+        <Link className={buttonVariants()} to="/_subjects/new">
+          Create Subject <Plus />
         </Link>
       </div>
-      <DataTable<ClassResponse>
+      <DataTable<SubjectResponse>
         filter={"name"}
         columns={columns}
-        data={classes}
+        data={subjects}
         handleDelete={handleMultiDelete()}
         pageCount={total / perPage > 0 ? Math.ceil(total / perPage) : 1}
       />

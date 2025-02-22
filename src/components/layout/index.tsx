@@ -1,29 +1,47 @@
 import { Button } from "@/components/ui/button";
-import { useUserContext } from "@/contexts/auth";
+import { USER_KEY, useUserContext } from "@/contexts/auth";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { LogOut, Users, Boxes, Book, FileQuestion, Home } from "lucide-react";
+import {
+  LogOut,
+  Users,
+  Boxes,
+  Book,
+  FileQuestion,
+  Home,
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import { logout, me } from "@/api/auth";
 
 const navItems = [
-  { to: "/_users", icon: Users, label: "Users" },
-  { to: "/_classes", icon: Boxes, label: "Classes" },
-  { to: "/_subjects", icon: Book, label: "Subjects" },
-  { to: "/_questions", icon: FileQuestion, label: "Questions" },
+  { to: "/admin/_users", icon: Users, label: "Users" },
+  { to: "/admin/_classes", icon: Boxes, label: "Classes" },
+  { to: "/admin/_subjects", icon: Book, label: "Subjects" },
+  { to: "/admin/_questions", icon: FileQuestion, label: "Questions" },
   { to: window.location.pathname, icon: LogOut, label: "Logout" },
 ];
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { setData } = useUserContext();
+  const { setData, data } = useUserContext();
+  const isAdmin = data.role === "ADMIN";
   const navigate = useNavigate();
   useEffect(() => {
     (async () => {
-      const data = await me();
-      if (data) {
-        setData(data);
-      } else {
+      try {
+        const data = await me();
+        if (data) {
+          setData(data);
+        } else {
+          toast.error("Please login to continue");
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error(error);
         toast.error("Please login to continue");
         navigate("/login");
       }
@@ -32,7 +50,7 @@ const Layout = () => {
 
   const handleLogout = async () => {
     await logout();
-    localStorage.removeItem("user");
+    localStorage.removeItem(USER_KEY);
     setData({
       role: "STUDENT",
       id: 0,
@@ -55,42 +73,44 @@ const Layout = () => {
         <Button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="mb-4 self-end"
+          variant="ghost"
+          size="icon"
         >
-          {isSidebarOpen ? "←" : "→"}
+          {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
         </Button>
         <h2 className={`text-xl font-bold text-gray-800`}>
-          <Link className="flex items-center" to="/dashboard">
+          <Link
+            className="flex items-center"
+            to={isAdmin ? "/admin/dashboard" : "/student"}
+          >
             <Home className="mr-2" size={40} />{" "}
-            {isSidebarOpen && <span>Dashboard</span>}
+            {isSidebarOpen &&
+              (isAdmin ? <span>Dashboard</span> : <span>Home</span>)}
           </Link>
         </h2>
         <ul className="mt-4 h-full">
-          <div className={`md:flex flex-col h-full ${isSidebarOpen ? "" : "hidden"}`}>
-            {navItems.map(({ to, icon: Icon, label }) => (
-              <li className="my-4 last:mt-auto" key={label}>
-                <Link
-                  to={to}
-                  className="text-gray-600 hover:text-gray-900 flex items-center"
-                  onClick={
-                    to === window.location.pathname ? handleLogout : () => {}
-                  }
-                >
-                  <Icon className="mr-2" size={40} />
-                  {isSidebarOpen && <span>{label}</span>}
-                </Link>
-              </li>
-            ))}
+          <div
+            className={`md:flex flex-col h-full ${
+              isSidebarOpen ? "" : "hidden"
+            }`}
+          >
+            {navItems.map(({ to, icon: Icon, label }) =>
+              isAdmin || to === window.location.pathname ? (
+                <li className="my-4 last:mt-auto" key={label}>
+                  <Link
+                    to={to}
+                    className="text-gray-600 hover:text-gray-900 flex items-center"
+                    onClick={
+                      to === window.location.pathname ? handleLogout : () => {}
+                    }
+                  >
+                    <Icon className="mr-2" size={40} />
+                    {isSidebarOpen && <span>{label}</span>}
+                  </Link>
+                </li>
+              ) : null
+            )}
           </div>
-          {/* <li className="my-6">
-            <Link
-              to={window.location.pathname}
-              className="text-gray-600 hover:text-gray-900 flex items-center"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2" size={40} />
-              {isSidebarOpen && <span>Logout</span>}
-            </Link>
-          </li> */}
         </ul>
       </div>
 
@@ -99,13 +119,29 @@ const Layout = () => {
         {/* Navbar */}
         <header className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
           <h1 className="text-xl font-bold ml-12 md:ml-0">Welcome</h1>
-          <div>
+          {/* <div>
             <Button className="bg-blue-600 text-white">Profile</Button>
-          </div>
+          </div> */}
         </header>
 
         {/* Page Content */}
         <main className="p-6 overflow-auto flex-1">
+          <nav className="pb-6 mb-4 border-b border-gray-200">
+            <div className="flex justify-between">
+              <Button
+                onClick={() => navigate(-1)}
+                className="bg-blue-600 text-white"
+              >
+                <ArrowLeft /> <span>Back</span>
+              </Button>
+              <Button
+                onClick={() => navigate(1)}
+                className="bg-blue-600 text-white"
+              >
+                <span>Forward</span> <ArrowRight />
+              </Button>
+            </div>
+          </nav>
           <Outlet />
         </main>
       </div>

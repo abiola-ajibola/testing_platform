@@ -18,7 +18,7 @@ async function getMany() {
     return response.data;
   } catch (error) {
     console.error("Users request failed", error);
-    throw error;
+    // throw error;
   }
 }
 

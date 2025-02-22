@@ -1,0 +1,3 @@
+
+echo Installing dependencies...
+yarn && yarn build:all && yarn migrate deploy && yarn seed && yarn start

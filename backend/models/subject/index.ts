@@ -8,7 +8,7 @@ export interface ICreateSubject {
 }
 
 export type TGetallSubjectsQuery = Partial<
-ICreateSubject & {
+  ICreateSubject & {
     page: number;
     perPage: number;
     role: Role;
@@ -19,7 +19,26 @@ class Subject {
   async getOne(id: number) {
     return await prisma.subject.findUnique({
       where: { id },
+      include: { class: true },
     });
+  }
+
+  async getByClassId(
+    { page = 1, perPage = 10, classId }: TGetallSubjectsQuery = {
+      page: 1,
+      perPage: 10,
+    }
+  ) {
+    const where = { classId };
+    const total = await prisma.subject.count({ where });
+    return {
+      subjects: await prisma.subject.findMany({
+        where,
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
   }
 
   async getAll(
@@ -34,12 +53,18 @@ class Subject {
       }
       return acc;
     }, {});
-    return await prisma.subject.findMany({
-      skip: page * perPage - perPage,
-      take: perPage,
-      where,
-      // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
-    });
+    const total = await prisma.subject.count({ where });
+    return {
+      subjects: await prisma.subject.findMany({
+        skip: page * perPage - perPage,
+        take: perPage,
+        where,
+        include: { class: true },
+      }),
+      total,
+      perPage,
+      currentPage: total > 0 ? page : 1,
+    };
   }
 
   async createOne(data: ICreateSubject) {

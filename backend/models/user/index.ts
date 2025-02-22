@@ -6,7 +6,8 @@ export interface ICreateUser {
   password: string;
   first_name: string;
   last_name: string;
-  middle_name: string;
+  middle_name: string | null;
+  role?: Role;
   _classes?: number[];
 }
 
@@ -14,7 +15,6 @@ export type TGetallUsersQuery = Partial<
   Omit<ICreateUser, "password"> & {
     page: number;
     perPage: number;
-    role: Role;
   }
 >;
 
@@ -67,11 +67,14 @@ class User {
     return await prisma.user.findUnique({
       where: { username },
       omit: { password: false },
+      include: {
+        classes: true,
+      },
     });
   }
 
   async createOne(data: ICreateUser) {
-    return await prisma.user.create({ data: { ...data, role: Role.STUDENT } });
+    return await prisma.user.create({ data: { ...data, } });
   }
 
   async updateOne(data: Partial<ICreateUser> & { id: number }) {

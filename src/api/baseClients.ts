@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosProgressEvent } from "axios";
 import apiClient from "./client";
 import { toast } from "react-toastify";
 
@@ -16,7 +16,7 @@ export async function simpleGet<T, U = undefined>(url: string, query?: U) {
     const er = error as AxiosError<T>;
     console.error(er);
     toast.error(er.message);
-    throw error;
+    // throw error;
   }
 }
 
@@ -29,23 +29,26 @@ export async function simpleDelete<T>(url: string, id: number) {
     const er = error as AxiosError<T>;
     console.error(er);
     toast.error(er.message);
-    throw error;
+    // throw error;
   }
 }
 
 export async function simplePost<DataType, ResponseType>(
   url: string,
-  data: DataType
+  data: DataType,
+  config: { showSuccessToast?: boolean } = { showSuccessToast: true }
 ) {
   try {
     const response = await apiClient.post<ResponseType>(url, data);
-    toast.success("Created successfully");
+    if (config.showSuccessToast) {
+      toast.success("Created successfully");
+    }
     return response.data;
   } catch (error) {
     const er = error as AxiosError<ResponseType>;
     console.error(er);
     toast.error(er.message);
-    throw error;
+    // throw error;
   }
 }
 
@@ -61,6 +64,34 @@ export async function simplePatch<DataType, ResponseType>(
     const er = error as AxiosError<ResponseType>;
     console.error(er);
     toast.error(er.message);
-    throw error;
+    // throw error;
+  }
+}
+
+export async function uploadFile<ResponseType>(
+  url: string,
+  file: File | Blob,
+  body: { currentName: string } | null,
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
+) {
+  const formData = new FormData();
+  formData.append("file", file);
+  if (body) {
+    formData.append("currentName", body.currentName);
+  }
+  try {
+    const response = await apiClient.post<ResponseType>(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress,
+    });
+    // toast.success("Uploaded successfully");
+    return response.data;
+  } catch (error) {
+    const er = error as AxiosError;
+    console.error(er);
+    toast.error(er.message);
+    // throw error;
   }
 }

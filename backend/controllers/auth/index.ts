@@ -9,6 +9,7 @@ import {
   signupValidationSchema,
 } from "../../utils/validation/auth";
 import { validateBody } from "../../middlewares";
+import { Role } from "../../constants";
 
 async function signup(req: Request, res: Response) {
   try {
@@ -20,7 +21,7 @@ async function signup(req: Request, res: Response) {
     const password = await hashPassword(req.body.password);
     const _user = await user.createOne({ ...req.body, password });
     // store user information in session
-    req.session.user = { ..._user, password: null };
+    req.session.user! = { ..._user, password: null, role: _user.role as Role };
 
     // save the session before sending response to ensure
     // session is saved before response is sent
@@ -69,7 +70,7 @@ async function login(req: Request, res: Response) {
       return;
     }
 
-    req.session.user = { ..._user, password: null };
+    req.session.user = { ..._user, role: _user.role as Role, password: null };
     req.session.save(function (err) {
       if (err) {
         console.log({ err });
@@ -142,7 +143,9 @@ async function changePassword(req: Request, res: Response) {
 }
 
 async function me(req: Request, res: Response) {
-  res.status(StatusCodes.OK).json({ data: {...req.session.user, password: undefined} });
+  res
+    .status(StatusCodes.OK)
+    .json({ data: { ...req.session.user, password: undefined } });
 }
 
 const authRouter = Router();
