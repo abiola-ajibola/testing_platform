@@ -5,9 +5,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node build/app.js",
+    "start": "cd build && node app.js --envfile=.env",
     "build": "tsc",
-    "dev": "nodemon -e ts --exclude build/ --exec 'tsc && node build/app.js --envfile=.env'",
+    "dev": "nodemon -e ts --exclude build/ --exec 'tsc && node build/app.js --envfile=.dev.env'",
     "prisma": "prisma"
   },
   "dependencies": {

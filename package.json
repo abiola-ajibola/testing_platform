@@ -7,8 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build --config vite.production.config.ts",
     "lint": "eslint .",
+    "migrate": "cd backend && yarn prisma migrate deploy",
+    "seed": "cd backend && yarn prisma db seed",
     "preview": "vite preview --config vite.production.config.ts",
-    "tailwindcss": "tailwindcss"
+    "tailwindcss": "tailwindcss",
+    "build:all": "tsc -b && vite build --config vite.production.config.ts && cd backend && yarn build",
+    "start": "cd backend && yarn start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -53,5 +57,6 @@
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
