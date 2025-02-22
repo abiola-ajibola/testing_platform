@@ -74,7 +74,7 @@ class User {
   }
 
   async createOne(data: ICreateUser) {
-    return await prisma.user.create({ data: { ...data, role: Role.STUDENT } });
+    return await prisma.user.create({ data: { ...data, } });
   }
 
   async updateOne(data: Partial<ICreateUser> & { id: number }) {
