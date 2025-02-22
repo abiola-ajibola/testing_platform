@@ -11,6 +11,7 @@ import { subjectRouter } from "./controllers/subject";
 import { testRouter } from "./controllers/test";
 import { staticRouter } from "./controllers/static";
 import { ICreateUser } from "./models/user";
+import { access, constants } from "fs";
 
 declare module "express-session" {
   interface Session {
@@ -47,7 +48,6 @@ app.use(
     store: new SQLiteStore({ db: "sessions.db" }) as Store,
     name: "axis",
     cookie: {
-      secure: NODE_ENV !== "development",
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
       sameSite: "strict",
@@ -70,7 +70,22 @@ app.use("/test", testRouter);
 app.use("/static", staticRouter);
 
 app.get("*", (req: Request, res: Response) => {
-  res.sendFile("index.html", { root: "frontend" });
+  if (NODE_ENV === "development") {
+    res.sendFile("index.html", { root: "frontend" });
+  }
+  try {
+    console.log(req.url);
+    access(`frontend${req.url}`, constants.F_OK, (err) => {
+      if (err) {
+        console.log({ code: err.code, path: err.path });
+        res.sendFile("index.html", { root: "frontend" });
+        return;
+      }
+      res.sendFile(req.url, { root: "frontend" });
+    });
+  } catch (error) {
+    console.log({ error });
+  }
 });
 
 app.get("/ping", (req: Request, res: Response) => {
