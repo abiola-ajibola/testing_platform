@@ -14,7 +14,8 @@
     "build:all": "tsc -b && vite build --config vite.production.config.ts && cd backend && yarn build",
     "build:noCheck": "tsc -b && vite build --config vite.production.config.ts && cd backend && yarn build:noCheck",
     "start": "cd backend && yarn start",
-    "install:all": "yarn && cd backend && yarn"
+    "install:all": "yarn && cd backend && yarn",
+    "prisma": "cd backend && yarn prisma"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

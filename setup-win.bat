@@ -1,3 +1,3 @@
 
 echo Installing dependencies...
-yarn install:all && yarn build:noCheck && yarn migrate deploy && yarn seed && yarn start
+yarn install:all && yarn build:noCheck && yarn migrate deploy && yarn prisma generate && yarn seed && yarn start
