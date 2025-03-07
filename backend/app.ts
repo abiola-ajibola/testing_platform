@@ -38,9 +38,16 @@ declare module "express-session" {
 
 const pgSession = connectPg(session);
 
-const { PORT = "8000", SESSION_SECRET, NODE_ENV_BE, DATABASE_URL } = process.env;
+const {
+  PORT = "8000",
+  SESSION_SECRET,
+  NODE_ENV_BE,
+  DATABASE_URL,
+} = process.env;
 
 const pool = new pg.Pool({ connectionString: DATABASE_URL });
+
+console.log({ DATABASE_URL, SESSION_SECRET, NODE_ENV_BE });
 
 const app = express();
 
