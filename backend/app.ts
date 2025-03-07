@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import session, { Store } from "express-session";
-import StoreInitiator from "connect-sqlite3";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+import pg from "pg";
 import { authRouter } from "./controllers/auth";
 import { usersRouter } from "./controllers/user";
 import { classRouter } from "./controllers/class";
@@ -35,9 +36,11 @@ declare module "express-session" {
   }
 }
 
-const SQLiteStore = StoreInitiator(session);
+const pgSession = connectPg(session);
 
-const { PORT = "8000", SESSION_SECRET, NODE_ENV } = process.env;
+const { PORT = "8000", SESSION_SECRET, NODE_ENV, DATABASE_URL } = process.env;
+
+const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
 const app = express();
 
@@ -46,7 +49,10 @@ app.use(
     secret: SESSION_SECRET as string,
     resave: false,
     saveUninitialized: true,
-    store: new SQLiteStore({ db: "sessions.db" }) as Store,
+    store: new pgSession({
+      pool,
+      tableName: "Session",
+    }),
     name: "axis",
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7,
