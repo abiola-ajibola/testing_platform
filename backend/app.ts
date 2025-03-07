@@ -38,7 +38,7 @@ declare module "express-session" {
 
 const pgSession = connectPg(session);
 
-const { PORT = "8000", SESSION_SECRET, NODE_ENV, DATABASE_URL } = process.env;
+const { PORT = "8000", SESSION_SECRET, NODE_ENV_BE, DATABASE_URL } = process.env;
 
 const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
@@ -77,7 +77,7 @@ app.use("/test", testRouter);
 app.use("/static", staticRouter);
 
 app.get("*", (req: Request, res: Response) => {
-  if (NODE_ENV === "development") {
+  if (NODE_ENV_BE === "development") {
     res.sendFile("index.html", { root: "frontend" });
   }
   try {
