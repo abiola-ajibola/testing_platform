@@ -19,6 +19,6 @@
 
 - From the root directory, run:
 
-        yarn install:all && yarn build:noCheck && yarn start
+        yarn install:all && yarn build:noCheck && yarn prisma generate --no-engine && yarn start
 
 
