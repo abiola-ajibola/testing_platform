@@ -3,6 +3,7 @@ import cors from "cors";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import pg from "pg";
+import { config } from "dotenv";
 import { authRouter } from "./controllers/auth";
 import { usersRouter } from "./controllers/user";
 import { classRouter } from "./controllers/class";
@@ -14,6 +15,7 @@ import { staticRouter } from "./controllers/static";
 import { ICreateUser } from "./models/user";
 import { access, constants } from "fs";
 import { networkInterfaces } from "os";
+config({ path: ".env" });
 
 declare module "express-session" {
   interface Session {
