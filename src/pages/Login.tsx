@@ -39,7 +39,8 @@ export function LoginPage() {
     if (response) {
       // Redirect to dashboard
       setData(response);
-      navigate("/admin/dashboard", { replace: true });
+      if (response.role === "STUDENT") navigate("/student", { replace: true });
+      else navigate("/admin/dashboard", { replace: true });
     }
   };
   return (

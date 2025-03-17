@@ -8,7 +8,7 @@
     "start": "cd build && node app.js",
     "build": "tsc",
     "build:noCheck": "tsc --noCheck",
-    "dev": "nodemon -e ts --exclude build/ --exec 'tsc && node build/app.js --env-file=.dev.env'",
+    "dev": "nodemon -e ts --exclude build/ --exec 'tsc && node build/app.js'",
     "prisma": "prisma"
   },
   "prisma": {
@@ -20,6 +20,7 @@
     "bcrypt": "^5.1.1",
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "1.18.0",
     "http-status-codes": "^2.3.0",
