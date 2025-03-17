@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { USER_KEY, useUserContext } from "@/contexts/auth";
+import { useUserContext } from "@/contexts/auth";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import {
@@ -15,15 +15,17 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import { logout, me } from "@/api/auth";
+import { me } from "@/api/auth";
 
 const navItems = [
   { to: "/admin/_users", icon: Users, label: "Users" },
   { to: "/admin/_classes", icon: Boxes, label: "Classes" },
   { to: "/admin/_subjects", icon: Book, label: "Subjects" },
   { to: "/admin/_questions", icon: FileQuestion, label: "Questions" },
-  { to: window.location.pathname, icon: LogOut, label: "Logout" },
+  { to: "/logout", icon: LogOut, label: "Logout" },
 ];
+
+console.log({ navItems });
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -47,20 +49,6 @@ const Layout = () => {
       }
     })();
   }, [navigate, setData]);
-
-  const handleLogout = async () => {
-    await logout();
-    localStorage.removeItem(USER_KEY);
-    setData({
-      role: "STUDENT",
-      id: 0,
-      username: "",
-      first_name: "",
-      middle_name: "",
-      last_name: "",
-    });
-    navigate("/login");
-  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -95,14 +83,11 @@ const Layout = () => {
             }`}
           >
             {navItems.map(({ to, icon: Icon, label }) =>
-              isAdmin || to === window.location.pathname ? (
+              isAdmin || to === "/logout" ? (
                 <li className="my-4 last:mt-auto" key={label}>
                   <Link
                     to={to}
                     className="text-gray-600 hover:text-gray-900 flex items-center"
-                    onClick={
-                      to === window.location.pathname ? handleLogout : () => {}
-                    }
                   >
                     <Icon className="mr-2" size={40} />
                     {isSidebarOpen && <span>{label}</span>}
