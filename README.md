@@ -4,9 +4,9 @@
 - To run sqlite, you need to have Python 3 insatlled
 - Node v22 and above
 
-## To runthe project in development
+## To run the project in development
 
-- In the roo directory, run:
+- In the root directory, run:
 
         yarn dev
 
@@ -19,6 +19,6 @@
 
 - From the root directory, run:
 
-        yarn install:all && yarn build:noCheck && yarn prisma generate --no-engine && yarn start
+        yarn install:all && yarn build:noCheck && yarn prisma generate && yarn start
 
 
