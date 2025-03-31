@@ -1,24 +1,28 @@
 # Setup
 
 ## Requirements
-- To run sqlite, you need to have Python 3 insatlled
+- Database management system is PostgreSQL
 - Node v22 and above
 
-## To runthe project in development
+## To run the project in development
 
-- In the roo directory, run:
+- Install all dependencies, in the root directory run;
+
+        yarn install:all
+
+- To start the app in development, in the root directory, run:
 
         yarn dev
 
-- Then run the following in another terminal window
+- and then run the following in another terminal window
 
         cd backend
-        yarn 
+        yarn dev
 
 ## To run the project in production
 
 - From the root directory, run:
 
-        yarn install:all && yarn build:noCheck && yarn prisma generate --no-engine && yarn start
+        yarn install:all && yarn build:noCheck && yarn prisma generate && yarn start
 
 

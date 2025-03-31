@@ -28,11 +28,11 @@ export async function login(
   request: LoginRequest
 ): Promise<LoginResponse | void> {
   try {
-    const response = await apiClient.post<LoginResponse>(
+    const response = await apiClient.post<{ data: LoginResponse }>(
       "/auth/login",
       request
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     const er = error as AxiosError;
     console.error("Login request failed", er?.response?.data);

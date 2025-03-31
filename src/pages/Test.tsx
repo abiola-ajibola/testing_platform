@@ -73,7 +73,9 @@ export function Test() {
                           question.id.toString() + (option.id?.toString() || "")
                         }
                       >
-                        <div className="mb-4">{option.text || ""}</div>
+                        <div className={option.image_url ? "mb-4" : ""}>
+                          {option.text || ""}
+                        </div>
                         {option.image_url && (
                           <img
                             className="object-contain mb-6"

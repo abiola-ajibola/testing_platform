@@ -33,6 +33,8 @@ import {
   testPageLoader,
   userLoader,
 } from "./loaders";
+import { Logout } from "./pages/Logout";
+import { NotFound } from "./pages/NotFound";
 
 export type DashboardData = Awaited<ReturnType<typeof dashboardLoader>>;
 export type TestPageData = Awaited<ReturnType<typeof testPageLoader>>;
@@ -142,6 +144,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/logout",
+    element: <Logout />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 
