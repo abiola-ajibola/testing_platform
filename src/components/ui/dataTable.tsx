@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -22,9 +22,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  // DropdownMenuItem,
-  // DropdownMenuLabel,
-  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -174,12 +171,15 @@ export function DataTable<T>({
   filter,
   pageCount = 1,
   handleDelete,
+  onPaginationChange,
 }: {
   data: T[];
   columns: ColumnDef<T>[];
   filter?: keyof T;
   pageCount?: number;
   handleDelete?: (table: Table<T>) => void;
+  /** Don't forget to use useCallback hook **/
+  onPaginationChange?: (pageIndex: number, perPage: number) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -187,6 +187,10 @@ export function DataTable<T>({
   const [rowSelection, setRowSelection] = useState({});
   const [columnOrder, setColumnOrder] = useState<string[]>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+
+  useEffect(() => {
+    onPaginationChange?.(pagination.pageIndex, pagination.pageSize);
+  }, [onPaginationChange, pagination.pageIndex, pagination.pageSize]);
 
   const table = useReactTable({
     data,
@@ -201,6 +205,7 @@ export function DataTable<T>({
     onRowSelectionChange: setRowSelection,
     onColumnOrderChange: setColumnOrder,
     onPaginationChange: setPagination,
+    manualPagination: true,
     pageCount,
     state: {
       sorting,
@@ -212,7 +217,7 @@ export function DataTable<T>({
     },
   });
 
-  console.log({ pagination });
+  // console.log(JSON.stringify({ pagination }, null, 2));
 
   return (
     <div className="w-full">
@@ -271,7 +276,7 @@ export function DataTable<T>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border mb-4">
         <MyTable>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
