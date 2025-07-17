@@ -33,12 +33,12 @@ export type QuestionResponse = ICreateQuestion & {
 export const question = {
   getCount: () => simpleGet<{ count: number }>("/question/count"),
   get: (id: number) => simpleGet<{ data: QuestionResponse }>(`/question/${id}`),
-  getMany: (query?: Partial<ICreateQuestion>) =>
+  getMany: (query?: Partial<{ page: number; perPage: number }>) =>
     simpleGet<
       {
         data: ResponseWithPagination<{ questions: QuestionResponse[] }>;
       },
-      Partial<ICreateQuestion>
+      Partial<{ page: number; perPage: number }>
     >("/question", query),
 
   getBySubjectID: (subjectId: string) =>

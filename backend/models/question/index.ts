@@ -37,7 +37,12 @@ class Question {
   }
 
   async getMany(
-    { page = 1, perPage = 10, omitCorrect = true, ...restFilters }: TGetallQuestionsQuery = {
+    {
+      page = 1,
+      perPage = 10,
+      omitCorrect = true,
+      ...restFilters
+    }: TGetallQuestionsQuery = {
       page: 1,
       perPage: 10,
       omitCorrect: true,
@@ -59,8 +64,8 @@ class Question {
     const total = await prisma.question.count({ where });
     return {
       questions: await prisma.question.findMany({
-        skip: page * perPage - perPage,
-        take: perPage,
+        skip: +page * +perPage - +perPage,
+        take: +perPage,
         where,
         include: {
           options: {
@@ -71,8 +76,8 @@ class Question {
         // factor in filtering by date created and last modified. see: https://www.prisma.io/docs/orm/reference/prisma-client-reference#gte
       }),
       total,
-      perPage,
-      currentPage: total > 0 ? page : 1,
+      perPage: +perPage,
+      currentPage: +(total > 0 ? page : 1),
     };
   }
 

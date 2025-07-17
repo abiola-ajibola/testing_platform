@@ -1,5 +1,5 @@
 import { ResponseWithPagination } from "@/api/baseClients";
-import { question as client, QuestionResponse } from "@/api/question";
+import { question as client, question, QuestionResponse } from "@/api/question";
 import { buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/dataTable";
@@ -20,6 +20,14 @@ export function Questions() {
 
   const questions = questionsData?.data.questions || _questions.data.questions;
   const { perPage, total } = questionsData?.data || _questions.data || {};
+
+  const handlePaginationChange = useCallback(
+    async (pageNumber: number, perPage: number) => {
+      const q = await question.getMany({ page: pageNumber + 1, perPage });
+      setQuestionssData(q || null);
+    },
+    []
+  );
 
   const handleMultiDelete = useCallback(() => {
     return async function (table: Table<QuestionResponse>) {
@@ -122,6 +130,7 @@ export function Questions() {
         data={questions}
         handleDelete={handleMultiDelete()}
         pageCount={total / perPage > 0 ? Math.ceil(total / perPage) : 1}
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   );
