@@ -15,7 +15,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ChevronDown, Trash } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  LoaderCircle,
+  Trash,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +45,7 @@ export function DataTable<T>({
   data,
   columns,
   filter,
+  isLoading = false,
   pageCount = 1,
   handleDelete,
   onPaginationChange,
@@ -47,6 +54,7 @@ export function DataTable<T>({
   columns: ColumnDef<T>[];
   filter?: keyof T;
   pageCount?: number;
+  isLoading?: boolean;
   handleDelete?: (table: Table<T>) => void;
   /** Don't forget to use useCallback hook **/
   onPaginationChange?: (pageIndex: number, perPage: number) => void;
@@ -114,7 +122,7 @@ export function DataTable<T>({
             onClick={() => {
               handleDelete(table);
             }}
-            disabled={!table.getSelectedRowModel().rows.length}
+            disabled={!table.getSelectedRowModel().rows.length || isLoading}
           >
             <span className="md:inline hidden">Delete</span> <Trash />
           </Button>
@@ -188,7 +196,16 @@ export function DataTable<T>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="relative">
+            <TableRow className="border-none">
+              <TableCell className="p-0">
+                {isLoading && (
+                  <div className="flex justify-center items-center absolute top-0 right-0 w-full h-full bg-gray-100 bg-opacity-70 z-[9]">
+                    <LoaderCircle className="animate-spin" size={72} />
+                  </div>
+                )}
+              </TableCell>
+            </TableRow>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
