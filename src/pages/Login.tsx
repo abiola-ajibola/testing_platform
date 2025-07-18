@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { InputGroup } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "@/contexts/auth";
+import { useState } from "react";
 
 const passwordMatcher =
   import.meta.env.MODE === "development"
@@ -34,13 +35,19 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { setData } = useUserContext();
 
+  const [isLoading, setIsLoading] = useState(false);
   const handleLogin = async (data: LoginForm) => {
-    const response = await login(data);
-    if (response) {
-      // Redirect to dashboard
-      setData(response);
-      if (response.role === "STUDENT") navigate("/student", { replace: true });
-      else navigate("/admin/dashboard", { replace: true });
+    try {
+      setIsLoading(true);
+      const response = await login(data);
+      if (response) {
+        // Redirect to dashboard
+        setData(response);
+        if (response.role === "STUDENT") navigate("/student", { replace: true });
+        else navigate("/admin/dashboard", { replace: true });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -91,6 +98,8 @@ export function LoginPage() {
           <Button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg"
+            isLoading={isLoading}
+            disabled={isLoading}
           >
             Login
           </Button>

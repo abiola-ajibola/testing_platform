@@ -18,6 +18,7 @@ import {
   OptionsOrGroups,
   SingleValue,
 } from "node_modules/react-select/dist/declarations/src";
+import { useState } from "react";
 
 const animatedComponents = makeAnimated();
 
@@ -28,6 +29,7 @@ const schema: ObjectSchema<ICreateSubject> = object({
 });
 
 export function EditSubject() {
+  const [isLoading, setIsLoading] = useState(false);
   const loaderData = useLoaderData<{
     subject: SubjectResponse | null;
     classes: ClassResponse[];
@@ -56,21 +58,26 @@ export function EditSubject() {
   });
 
   const onSubmit = async (data: ICreateSubject) => {
-    const response =
-      id === "new"
-        ? await subject.create({
-            name: data.name,
-            description: data.description,
-            classId: data.classId,
-          })
-        : subject.update(Number(id), {
-            name: data.name,
-            description: data.description,
-            classId: data.classId,
-          });
-    if (id === "new" && response) {
-      reset();
-      navigate("/admin/_subjects");
+    try {
+      setIsLoading(true);
+      const response =
+        id === "new"
+          ? await subject.create({
+              name: data.name,
+              description: data.description,
+              classId: data.classId,
+            })
+          : subject.update(Number(id), {
+              name: data.name,
+              description: data.description,
+              classId: data.classId,
+            });
+      if (id === "new" && response) {
+        reset();
+        navigate("/admin/_subjects");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -150,7 +157,7 @@ export function EditSubject() {
           >
             {errors.role?.message}
           </div> */}
-          <Button type="submit">
+          <Button isLoading={isLoading} disabled={isLoading} type="submit">
             {id === "new" ? "Create Subject" : "Save"}
           </Button>
         </>

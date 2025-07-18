@@ -89,34 +89,40 @@ export function EditUser() {
     ),
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const onSubmit = async (
     data: Omit<IUser, "id" | "middle_name" | "password"> & {
       middle_name?: string | null;
       password?: string | null;
     }
   ) => {
-    const response =
-      id === "new"
-        ? await users.create({
-            middle_name: data.middle_name ?? "",
-            password: data.password!,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            role: data.role as "ADMIN" | "STUDENT",
-            username: data.username,
-          })
-        : users.update(Number(id), {
-            middle_name: data.middle_name ?? undefined,
-            password: data.password || undefined,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            role: data.role as "ADMIN" | "STUDENT",
-            username: data.username,
-            _classes: (data.classes as number[]) || undefined,
-          });
-    if (id === "new" && response) {
-      reset();
-      navigate("/admin/_users");
+    try {
+      setIsLoading(true);
+      const response =
+        id === "new"
+          ? await users.create({
+              middle_name: data.middle_name ?? "",
+              password: data.password!,
+              first_name: data.first_name,
+              last_name: data.last_name,
+              role: data.role as "ADMIN" | "STUDENT",
+              username: data.username,
+            })
+          : users.update(Number(id), {
+              middle_name: data.middle_name ?? undefined,
+              password: data.password || undefined,
+              first_name: data.first_name,
+              last_name: data.last_name,
+              role: data.role as "ADMIN" | "STUDENT",
+              username: data.username,
+              _classes: (data.classes as number[]) || undefined,
+            });
+      if (id === "new" && response) {
+        reset();
+        navigate("/admin/_users");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -295,7 +301,9 @@ export function EditUser() {
         )}
       </div>
       {!location.pathname.includes("view") && (
-        <Button type="submit">{id === "new" ? "Create User" : "Save"}</Button>
+        <Button isLoading={isLoading} disabled={isLoading} type="submit">
+          {id === "new" ? "Create User" : "Save"}
+        </Button>
       )}
     </form>
   );
