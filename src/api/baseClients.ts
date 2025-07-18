@@ -15,7 +15,9 @@ export async function simpleGet<T, U = undefined>(url: string, query?: U) {
   } catch (error) {
     const er = error as AxiosError<T>;
     console.error(er);
-    toast.error(er.message);
+    toast.error(
+      (er.response?.data as { message: string })?.message || er.message
+    );
     // throw error;
   }
 }
@@ -28,7 +30,9 @@ export async function simpleDelete<T>(url: string, id: number) {
   } catch (error) {
     const er = error as AxiosError<T>;
     console.error(er);
-    toast.error(er.message);
+    toast.error(
+      (er.response?.data as { message: string })?.message || er.message
+    );
     // throw error;
   }
 }
@@ -47,7 +51,9 @@ export async function simplePost<DataType, ResponseType>(
   } catch (error) {
     const er = error as AxiosError<ResponseType>;
     console.error(er);
-    toast.error(er.message);
+    toast.error(
+      (er.response?.data as { message: string })?.message || er.message
+    );
     // throw error;
   }
 }
