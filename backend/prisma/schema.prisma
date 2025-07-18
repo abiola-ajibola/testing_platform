@@ -46,13 +46,15 @@ model Subject {
 
 model Class {
   id           Int       @id @default(autoincrement())
-  name         String
+  name         String    @unique
   description  String
   subjects     Subject[]
   users        User[]
   createdAt    DateTime  @default(now())
   lastModified DateTime  @updatedAt
   Test         Test[]
+
+  @@index([name], name:"IDX_class_name")
 }
 
 model Question_Option {
