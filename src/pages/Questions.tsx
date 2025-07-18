@@ -20,7 +20,8 @@ export function Questions() {
   } | null>(null);
 
   const questions = questionsData?.data.questions || _questions.data.questions;
-  const { perPage, total } = questionsData?.data || _questions.data || {};
+  const { perPage, total, currentPage } =
+    questionsData?.data || _questions.data || {};
 
   const handlePaginationChange = useCallback(
     async (pageNumber: number, perPage: number) => {
@@ -47,28 +48,31 @@ export function Questions() {
           })
         );
         table.resetRowSelection();
-        const data = await client.getMany();
+        const data = await client.getMany({ page: currentPage, perPage });
         console.log({ data });
         setQuestionssData(data ? data : null);
       } finally {
         setIsLoading(false);
       }
     };
-  }, []);
+  }, [currentPage, perPage]);
 
-  async function handleSingleDelete(row: Row<QuestionResponse>) {
-    setIsLoading(true);
-    try {
-      console.log({ id: row.getValue("id") });
-      row.toggleSelected(false);
-      await client.delete(row.getValue("id"));
-      const data = await client.getMany();
-      console.log({ data });
-      setQuestionssData(data ? data : null);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const handleSingleDelete = useCallback(
+    async function (row: Row<QuestionResponse>) {
+      setIsLoading(true);
+      try {
+        console.log({ id: row.getValue("id") });
+        row.toggleSelected(false);
+        await client.delete(row.getValue("id"));
+        const data = await client.getMany({ page: currentPage, perPage });
+        console.log({ data });
+        setQuestionssData(data ? data : null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentPage, perPage]
+  );
 
   const columns: ColumnDef<QuestionResponse>[] = useMemo(
     () => [
@@ -129,7 +133,7 @@ export function Questions() {
         },
       },
     ],
-    []
+    [handleSingleDelete]
   );
 
   return (
