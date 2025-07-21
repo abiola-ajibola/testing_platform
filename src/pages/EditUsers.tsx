@@ -236,6 +236,7 @@ export function EditUser() {
                 setSelectedOption(data);
               }}
               selectedOption={selectedOption}
+              error={!!errors.role?.message}
             />
             <div
               className={cn(
