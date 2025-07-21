@@ -19,6 +19,7 @@ import {
   SingleValue,
 } from "node_modules/react-select/dist/declarations/src";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const animatedComponents = makeAnimated();
 
@@ -123,6 +124,7 @@ export function EditSubject() {
         <>
           <div className="mb-3">
             <AsynSelect
+              className={errors.classId?.message ? "selectComponentError" : ""}
               cacheOptions
               loadOptions={async (inputValue) => {
                 const data = await classes.getMany({ name: inputValue });
@@ -148,16 +150,22 @@ export function EditSubject() {
                 });
               }}
             />
+            <div
+              className={cn(
+                "text-xs",
+                errors.classId?.message
+                  ? "text-red-500"
+                  : "text-muted-foreground"
+              )}
+            >
+              {errors.classId?.message}
+            </div>
           </div>
-          {/* <div
-            className={cn(
-              "text-xs",
-              errors.role?.message ? "text-red-500" : "text-muted-foreground"
-            )}
+          <Button
+            isLoading={isLoading}
+            disabled={isLoading}
+            type="submit"
           >
-            {errors.role?.message}
-          </div> */}
-          <Button isLoading={isLoading} disabled={isLoading} type="submit">
             {id === "new" ? "Create Subject" : "Save"}
           </Button>
         </>
