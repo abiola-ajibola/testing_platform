@@ -319,6 +319,7 @@ export function EditQuestion() {
       {!location.pathname.includes("view") ? (
         <div className="mb-10">
           <AsynSelect
+            className={errors.subjectId?.message ? "selectComponentError" : ""}
             cacheOptions
             loadOptions={async (inputValue) => {
               const data = await subject.getMany({ name: inputValue });
@@ -344,6 +345,14 @@ export function EditQuestion() {
               });
             }}
           />
+          <div
+            className={cn(
+              "text-xs",
+              errors.subjectId?.message ? "text-red-500" : "text-muted-foreground"
+            )}
+          >
+            {errors.subjectId?.message}
+          </div>
         </div>
       ) : (
         <div className="mb-10">

@@ -256,14 +256,17 @@ export function EditUser() {
         {!location.pathname.includes("view") ? (
           <>
             <AsynSelect
+           className={errors.role?.message ? "selectComponentError" : ""}
               cacheOptions
               // options={classes.map((c) => ({ value: c.id, label: c.name }))}
               loadOptions={async (inputValue) => {
                 const data = await classes.getMany({ name: inputValue });
-                return data?.data.classes.map((c: ClassResponse) => ({
-                  value: c.id,
-                  label: c.name,
-                }))|| [];
+                return (
+                  data?.data.classes.map((c: ClassResponse) => ({
+                    value: c.id,
+                    label: c.name,
+                  })) || []
+                );
               }}
               defaultOptions={_classes?.map((c) => ({
                 value: c.id,
