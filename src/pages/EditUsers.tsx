@@ -7,7 +7,7 @@ import { Select } from "@/components/ui/dropdown-menu";
 import { InputGroup } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   useLoaderData,
@@ -25,13 +25,7 @@ const schema = object({
   username: string().required("Username is required"),
   first_name: string().required("First Name is required"),
   middle_name: string().nullable(),
-  password: string().nullable(),
-  confirm_password: string()
-    .nullable()
-    .oneOf(
-      [ref("password"), null],
-      "Confirm Password must be same as Password"
-    ),
+
   last_name: string().required("Last Name is required"),
   role: string().oneOf(["STUDENT", "ADMIN"]).required("Role is required"),
   classes: array(number()).default([]),
@@ -48,6 +42,23 @@ export function EditUser() {
     user: { data: Omit<IUser, "password"> | null };
     classes: { data: ResponseWithPagination<{ classes: ClassResponse[] }> };
   }>();
+  const location = useLocation();
+
+  const schemaWithPassword = useMemo(
+    () =>
+      schema.shape({
+        password: location.pathname.includes("new")
+          ? string().required("Password is required")
+          : string().nullable(),
+        confirm_password: string()
+          .nullable()
+          .oneOf(
+            [ref("password"), null],
+            "Confirm Password must be same as Password"
+          ),
+      }),
+    [location.pathname]
+  );
 
   const user = loaderData?.user.data;
   const _classes = loaderData?.classes.data.classes;
@@ -65,7 +76,6 @@ export function EditUser() {
 
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const {
     register,
@@ -85,7 +95,9 @@ export function EditUser() {
       classes: user?.classes ?? [],
     },
     resolver: yupResolver(
-      schema as ObjectSchema<Omit<IUser & { confirm_password: string }, "id">>
+      schemaWithPassword as ObjectSchema<
+        Omit<IUser & { confirm_password: string }, "id">
+      >
     ),
   });
 
@@ -256,7 +268,7 @@ export function EditUser() {
         {!location.pathname.includes("view") ? (
           <>
             <AsynSelect
-           className={errors.role?.message ? "selectComponentError" : ""}
+              className={errors.role?.message ? "selectComponentError" : ""}
               cacheOptions
               // options={classes.map((c) => ({ value: c.id, label: c.name }))}
               loadOptions={async (inputValue) => {
