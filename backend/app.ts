@@ -88,6 +88,7 @@ app.use("/static", staticRouter);
 app.get("*", (req: Request, res: Response) => {
   if (NODE_ENV_BE === "development") {
     res.sendFile("index.html", { root: "frontend" });
+    return;
   }
   try {
     console.log(req.url);
@@ -123,7 +124,8 @@ app.listen(parseInt(PORT), () => {
     const address = addresses?.[key]?.find((addr) => addr.family === "IPv4");
     if (address?.address === "127.0.0.1") {
       console.log(
-        `Go to http://${address.address}:${PORT} in your browser to view the app`
+        // `Go to http://${address.address}:${PORT} in your browser to view the app`
+        `Go to http://localhost:${PORT} in your browser to view the app`
       );
     }
     if (address?.address && address?.address !== "127.0.0.1") {

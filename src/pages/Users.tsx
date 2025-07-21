@@ -1,10 +1,10 @@
 import { LoginResponse } from "@/api/auth";
 import { ResponseWithPagination } from "@/api/baseClients";
 import { users as client } from "@/api/users";
-import { buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/dataTable";
 import { TableActions } from "@/components/ui/tableActions";
+import { buttonVariants } from "@/lib/utils";
 import { ColumnDef, Row, Table } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";

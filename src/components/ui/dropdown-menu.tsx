@@ -187,14 +187,15 @@ interface Option {
 
 interface SelectProps {
   options: Option[];
+  error?: boolean;
   selectedOption: Option | null;
   onSelect: (option: Option) => void;
 }
 
-const Select = ({ options, onSelect, selectedOption }: SelectProps) => {
+const Select = ({ options, onSelect, selectedOption, error }: SelectProps) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="px-4 py-2 bg-gray-200 rounded">
+      <DropdownMenuTrigger className={cn("px-4 py-2 bg-gray-200 rounded", error ? "border-red-500" : "")}>
         {selectedOption ? selectedOption.label : "Select an option"}
       </DropdownMenuTrigger>
       <DropdownMenuContent>

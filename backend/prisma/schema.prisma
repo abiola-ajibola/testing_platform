@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -34,7 +34,7 @@ model User {
 
 model Subject {
   id           Int        @id @default(autoincrement())
-  name         String
+  name         String     @unique
   class        Class      @relation(fields: [classId], references: [id], onDelete: Cascade)
   classId      Int        @default(0)
   description  String
@@ -42,17 +42,21 @@ model Subject {
   questions    Question[]
   createdAt    DateTime   @default(now())
   lastModified DateTime   @updatedAt
+
+  @@index([name], name: "IDX_subject_name")
 }
 
 model Class {
   id           Int       @id @default(autoincrement())
-  name         String
+  name         String    @unique
   description  String
   subjects     Subject[]
   users        User[]
   createdAt    DateTime  @default(now())
   lastModified DateTime  @updatedAt
   Test         Test[]
+
+  @@index([name], name: "IDX_class_name")
 }
 
 model Question_Option {

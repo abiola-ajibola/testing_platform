@@ -1,10 +1,11 @@
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { buttonVariants } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
 import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { Link } from "react-router-dom";

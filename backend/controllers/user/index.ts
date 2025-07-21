@@ -11,6 +11,7 @@ import { hashPassword } from "../../utils/crypto/password";
 import { validateBody, validateQuery } from "../../middlewares";
 import { getUsersValidationSchema } from "../../utils/validation/users";
 import { getCount } from "../baseControllers";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 async function addUser(req: Request, res: Response) {
   try {
@@ -19,8 +20,15 @@ async function addUser(req: Request, res: Response) {
     if (newUser) {
       res.status(StatusCodes.CREATED).json({ message: "User created" });
     }
-  } catch (error) {
-    console.log({ error });
+  } catch (e) {
+    const error = e as PrismaClientKnownRequestError;
+    console.dir(e, { depth: 6 });
+    if (error.code == "P2002" && (error.meta?.target as string[]).includes("username")) {
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Username already exists, please use another one." });
+        return
+    }
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });

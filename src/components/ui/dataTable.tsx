@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,16 +15,19 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ChevronDown, Trash } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  LoaderCircle,
+  Trash,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  // DropdownMenuItem,
-  // DropdownMenuLabel,
-  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -36,150 +39,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-// const data: Payment[] = [
-//   {
-//     id: "m5gr84i9",
-//     amount: 316,
-//     status: "success",
-//     email: "ken99@yahoo.com",
-//   },
-//   {
-//     id: "3u1reuv4",
-//     amount: 242,
-//     status: "success",
-//     email: "Abe45@gmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-// ]
-
-// export type Payment = {
-//   id: string
-//   amount: number
-//   status: "pending" | "processing" | "success" | "failed"
-//   email: string
-// }
-
-// export const columns: ColumnDef<Payment>[] = [
-//   {
-//     id: "select",
-//     header: ({ table }) => (
-//       <Checkbox
-//         checked={
-//           table.getIsAllPageRowsSelected() ||
-//           (table.getIsSomePageRowsSelected() && "indeterminate")
-//         }
-//         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-//         aria-label="Select all"
-//       />
-//     ),
-//     cell: ({ row }) => (
-//       <Checkbox
-//         checked={row.getIsSelected()}
-//         onCheckedChange={(value) => row.toggleSelected(!!value)}
-//         aria-label="Select row"
-//       />
-//     ),
-//     enableSorting: false,
-//     enableHiding: false,
-//   },
-//   {
-//     accessorKey: "status",
-//     header: "Status",
-//     cell: ({ row }) => (
-//       <div className="capitalize">{row.getValue("status")}</div>
-//     ),
-//   },
-//   {
-//     accessorKey: "email",
-//     header: ({ column }) => {
-//       return (
-//         <Button
-//           variant="ghost"
-//           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-//         >
-//           Email
-//           <ArrowUpDown />
-//         </Button>
-//       )
-//     },
-//     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-//   },
-//   {
-//     accessorKey: "amount",
-//     header: () => <div className="text-right">Amount</div>,
-//     cell: ({ row }) => {
-//       const amount = parseFloat(row.getValue("amount"))
-
-//       // Format the amount as a dollar amount
-//       const formatted = new Intl.NumberFormat("en-US", {
-//         style: "currency",
-//         currency: "USD",
-//       }).format(amount)
-
-//       return <div className="text-right font-medium">{formatted}</div>
-//     },
-//   },
-// {
-//   id: "actions",
-//   enableHiding: false,
-//   cell: ({ row }) => {
-//     const payment = row.original
-
-//     return (
-//       <DropdownMenu>
-//         <DropdownMenuTrigger asChild>
-//           <Button variant="ghost" className="h-8 w-8 p-0">
-//             <span className="sr-only">Open menu</span>
-//             <MoreHorizontal />
-//           </Button>
-//         </DropdownMenuTrigger>
-//         <DropdownMenuContent align="end">
-//           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-//           <DropdownMenuItem
-//             onClick={() => navigator.clipboard.writeText(payment.id)}
-//           >
-//             Copy payment ID
-//           </DropdownMenuItem>
-//           <DropdownMenuSeparator />
-//           <DropdownMenuItem>View customer</DropdownMenuItem>
-//           <DropdownMenuItem>View payment details</DropdownMenuItem>
-//         </DropdownMenuContent>
-//       </DropdownMenu>
-//     )
-//   },
-//   },
-// ]
+import { DataTablePagination } from "../TablePagination";
 
 export function DataTable<T>({
   data,
   columns,
   filter,
+  isLoading = false,
   pageCount = 1,
   handleDelete,
+  onPaginationChange,
 }: {
   data: T[];
   columns: ColumnDef<T>[];
   filter?: keyof T;
   pageCount?: number;
+  isLoading?: boolean;
   handleDelete?: (table: Table<T>) => void;
+  /** Don't forget to use useCallback hook **/
+  onPaginationChange?: (pageIndex: number, perPage: number) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -187,6 +65,10 @@ export function DataTable<T>({
   const [rowSelection, setRowSelection] = useState({});
   const [columnOrder, setColumnOrder] = useState<string[]>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+
+  useEffect(() => {
+    onPaginationChange?.(pagination.pageIndex, pagination.pageSize);
+  }, [onPaginationChange, pagination.pageIndex, pagination.pageSize]);
 
   const table = useReactTable({
     data,
@@ -201,6 +83,7 @@ export function DataTable<T>({
     onRowSelectionChange: setRowSelection,
     onColumnOrderChange: setColumnOrder,
     onPaginationChange: setPagination,
+    manualPagination: true,
     pageCount,
     state: {
       sorting,
@@ -212,7 +95,7 @@ export function DataTable<T>({
     },
   });
 
-  console.log({ pagination });
+  // console.log(JSON.stringify({ pagination }, null, 2));
 
   return (
     <div className="w-full">
@@ -239,7 +122,7 @@ export function DataTable<T>({
             onClick={() => {
               handleDelete(table);
             }}
-            disabled={!table.getSelectedRowModel().rows.length}
+            disabled={!table.getSelectedRowModel().rows.length || isLoading}
           >
             <span className="md:inline hidden">Delete</span> <Trash />
           </Button>
@@ -271,7 +154,7 @@ export function DataTable<T>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border mb-4">
         <MyTable>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -313,7 +196,16 @@ export function DataTable<T>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="relative">
+            <TableRow className="border-none">
+              <TableCell className="p-0">
+                {isLoading && (
+                  <div className="flex justify-center items-center absolute top-0 right-0 w-full h-full bg-gray-100 bg-opacity-70 z-[9]">
+                    <LoaderCircle className="animate-spin" size={72} />
+                  </div>
+                )}
+              </TableCell>
+            </TableRow>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -343,30 +235,7 @@ export function DataTable<T>({
           </TableBody>
         </MyTable>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      <DataTablePagination table={table} />
     </div>
   );
 }

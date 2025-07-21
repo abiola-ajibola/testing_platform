@@ -10,6 +10,7 @@ import {
 import { getCount } from "../baseControllers";
 import { isAdmin } from "../../middlewares/roles";
 import { isAuthenticated } from "../../middlewares/auth";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 async function create(req: Request, res: Response) {
   try {
@@ -17,8 +18,21 @@ async function create(req: Request, res: Response) {
     if (_subject) {
       res.status(StatusCodes.CREATED).json({ message: "Subject created" });
     }
-  } catch (error) {
-    console.log({ error });
+  } catch (e) {
+    const error = e as PrismaClientKnownRequestError;
+    console.dir(e, { depth: 6 });
+    if (
+      error.code == "P2002" &&
+      (error.meta?.target as string[]).includes("name")
+    ) {
+      res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+        message:
+          "A Subject with the name " +
+          req.body.name +
+          " already exists, please use another name.",
+      });
+      return;
+    }
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });

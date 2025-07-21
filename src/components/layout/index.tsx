@@ -28,7 +28,7 @@ const navItems = [
 console.log({ navItems });
 
 const Layout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { setData, data } = useUserContext();
   const isAdmin = data.role === "ADMIN";
   const navigate = useNavigate();

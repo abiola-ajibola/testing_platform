@@ -2,6 +2,7 @@ import { classes, ClassResponse, ICreateClass } from "@/api/classes";
 import { Button } from "@/components/ui/button";
 import { InputGroup } from "@/components/ui/input";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   useLoaderData,
@@ -17,6 +18,7 @@ const schema: ObjectSchema<ICreateClass> = object({
 });
 
 export function EditClass() {
+  const [isLoading, setIsLoading] = useState(false);
   const loaderData = useLoaderData<{
     data: ClassResponse | null;
   }>();
@@ -41,19 +43,24 @@ export function EditClass() {
   });
 
   const onSubmit = async (data: ICreateClass) => {
-    const response =
-      id === "new"
-        ? await classes.create({
-            name: data.name,
-            description: data.description,
-          })
-        : classes.update(Number(id), {
-            name: data.name,
-            description: data.description,
-          });
-    if (id === "new" && response) {
-      reset();
-      navigate("/admin/_classes");
+    setIsLoading(true);
+    try {
+      const response =
+        id === "new"
+          ? await classes.create({
+              name: data.name,
+              description: data.description,
+            })
+          : await classes.update(Number(id), {
+              name: data.name,
+              description: data.description,
+            });
+      if (id === "new" && response) {
+        reset();
+        navigate("/admin/_classes");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,7 +103,9 @@ export function EditClass() {
         />
       </div>
       {!location.pathname.includes("view") && (
-        <Button type="submit">{id === "new" ? "Create Class" : "Save"}</Button>
+        <Button disabled={isLoading} isLoading={isLoading} type="submit">
+          {id === "new" ? "Create Class" : "Save"}
+        </Button>
       )}
     </form>
   );

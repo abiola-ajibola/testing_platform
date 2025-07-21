@@ -18,6 +18,8 @@ import {
   OptionsOrGroups,
   SingleValue,
 } from "node_modules/react-select/dist/declarations/src";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const animatedComponents = makeAnimated();
 
@@ -28,6 +30,7 @@ const schema: ObjectSchema<ICreateSubject> = object({
 });
 
 export function EditSubject() {
+  const [isLoading, setIsLoading] = useState(false);
   const loaderData = useLoaderData<{
     subject: SubjectResponse | null;
     classes: ClassResponse[];
@@ -56,21 +59,26 @@ export function EditSubject() {
   });
 
   const onSubmit = async (data: ICreateSubject) => {
-    const response =
-      id === "new"
-        ? await subject.create({
-            name: data.name,
-            description: data.description,
-            classId: data.classId,
-          })
-        : subject.update(Number(id), {
-            name: data.name,
-            description: data.description,
-            classId: data.classId,
-          });
-    if (id === "new" && response) {
-      reset();
-      navigate("/admin/_subjects");
+    try {
+      setIsLoading(true);
+      const response =
+        id === "new"
+          ? await subject.create({
+              name: data.name,
+              description: data.description,
+              classId: data.classId,
+            })
+          : subject.update(Number(id), {
+              name: data.name,
+              description: data.description,
+              classId: data.classId,
+            });
+      if (id === "new" && response) {
+        reset();
+        navigate("/admin/_subjects");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -116,6 +124,7 @@ export function EditSubject() {
         <>
           <div className="mb-3">
             <AsynSelect
+              className={errors.classId?.message ? "selectComponentError" : ""}
               cacheOptions
               loadOptions={async (inputValue) => {
                 const data = await classes.getMany({ name: inputValue });
@@ -141,16 +150,22 @@ export function EditSubject() {
                 });
               }}
             />
+            <div
+              className={cn(
+                "text-xs",
+                errors.classId?.message
+                  ? "text-red-500"
+                  : "text-muted-foreground"
+              )}
+            >
+              {errors.classId?.message}
+            </div>
           </div>
-          {/* <div
-            className={cn(
-              "text-xs",
-              errors.role?.message ? "text-red-500" : "text-muted-foreground"
-            )}
+          <Button
+            isLoading={isLoading}
+            disabled={isLoading}
+            type="submit"
           >
-            {errors.role?.message}
-          </div> */}
-          <Button type="submit">
             {id === "new" ? "Create Subject" : "Save"}
           </Button>
         </>

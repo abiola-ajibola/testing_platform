@@ -1,6 +1,6 @@
 import { ResponseWithPagination } from "@/api/baseClients";
 import { SubjectResponse } from "@/api/subject";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/lib/utils";
 import { Link, useLoaderData } from "react-router-dom";
 
 export function StudentHome() {

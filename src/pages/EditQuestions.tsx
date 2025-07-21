@@ -61,6 +61,7 @@ type OptionType =
 // const optionsLength = 5;
 
 export function EditQuestion() {
+  const [isLoading, setIsLoading] = useState(false);
   const loaderData = useLoaderData<{
     data: QuestionResponse | null;
     // classes: ClassResponse[];
@@ -101,35 +102,41 @@ export function EditQuestion() {
 
   const onSubmit = async (data: ICreateQuestion) => {
     console.log({ data });
+    setIsLoading(true);
     if (!data.options?.some((option) => option.correct)) {
       setError("options", { message: "Select a correct option" });
+      setIsLoading(false);
       return;
     }
-    const response =
-      id === "new"
-        ? await question.create({
-            text: data.text,
-            subjectId: data.subjectId,
-            explanation: data.explanation,
-            explanationImageUrl: data.explanationImageUrl,
-            imageUrl: data.imageUrl,
-            options: data.options?.map((option) => ({
-              text: option.text,
-              correct: option.correct,
-              image_url: option.image_url,
-            })),
-          })
-        : question.update(Number(id), {
-            text: data.text,
-            subjectId: data.subjectId,
-            explanation: data.explanation,
-            explanationImageUrl: data.explanationImageUrl,
-            imageUrl: data.imageUrl,
-            options: data.options,
-          });
-    if (id === "new" && response) {
-      reset();
-      navigate("/admin/_questions");
+    try {
+      const response =
+        id === "new"
+          ? await question.create({
+              text: data.text,
+              subjectId: data.subjectId,
+              explanation: data.explanation,
+              explanationImageUrl: data.explanationImageUrl,
+              imageUrl: data.imageUrl,
+              options: data.options?.map((option) => ({
+                text: option.text,
+                correct: option.correct,
+                image_url: option.image_url,
+              })),
+            })
+          : question.update(Number(id), {
+              text: data.text,
+              subjectId: data.subjectId,
+              explanation: data.explanation,
+              explanationImageUrl: data.explanationImageUrl,
+              imageUrl: data.imageUrl,
+              options: data.options,
+            });
+      if (id === "new" && response) {
+        reset();
+        navigate("/admin/_questions");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -312,6 +319,7 @@ export function EditQuestion() {
       {!location.pathname.includes("view") ? (
         <div className="mb-10">
           <AsynSelect
+            className={errors.subjectId?.message ? "selectComponentError" : ""}
             cacheOptions
             loadOptions={async (inputValue) => {
               const data = await subject.getMany({ name: inputValue });
@@ -337,6 +345,14 @@ export function EditQuestion() {
               });
             }}
           />
+          <div
+            className={cn(
+              "text-xs",
+              errors.subjectId?.message ? "text-red-500" : "text-muted-foreground"
+            )}
+          >
+            {errors.subjectId?.message}
+          </div>
         </div>
       ) : (
         <div className="mb-10">
@@ -396,7 +412,7 @@ export function EditQuestion() {
         </>
       )}
       {!location.pathname.includes("view") && (
-        <Button type="submit">
+        <Button disabled={isLoading} isLoading={isLoading} type="submit">
           {id === "new" ? "Create Question" : "Save"}
         </Button>
       )}

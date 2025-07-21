@@ -11,6 +11,7 @@ import { useLoaderData } from "react-router-dom";
 export function Test() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [score, setScore] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const loaderData = useLoaderData<TestPageData>();
   const questions = loaderData?.data.questions;
 
@@ -28,6 +29,7 @@ export function Test() {
     });
     console.log({ answers, total: questions?.length || 0 });
     try {
+      setIsLoading(true);
       const data = await question.submitAnswers({
         answers,
         total: questions?.length || 0,
@@ -39,6 +41,8 @@ export function Test() {
       }
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,7 +98,7 @@ export function Test() {
             ))
           : null}
         <div>
-          <Button className="mt-8" type="submit">
+          <Button className="mt-8" type="submit" isLoading={isLoading} disabled={isLoading}>
             Submit
           </Button>
         </div>

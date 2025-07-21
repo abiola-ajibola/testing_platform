@@ -7,7 +7,7 @@ import { Select } from "@/components/ui/dropdown-menu";
 import { InputGroup } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   useLoaderData,
@@ -25,13 +25,7 @@ const schema = object({
   username: string().required("Username is required"),
   first_name: string().required("First Name is required"),
   middle_name: string().nullable(),
-  password: string().nullable(),
-  confirm_password: string()
-    .nullable()
-    .oneOf(
-      [ref("password"), null],
-      "Confirm Password must be same as Password"
-    ),
+
   last_name: string().required("Last Name is required"),
   role: string().oneOf(["STUDENT", "ADMIN"]).required("Role is required"),
   classes: array(number()).default([]),
@@ -48,6 +42,23 @@ export function EditUser() {
     user: { data: Omit<IUser, "password"> | null };
     classes: { data: ResponseWithPagination<{ classes: ClassResponse[] }> };
   }>();
+  const location = useLocation();
+
+  const schemaWithPassword = useMemo(
+    () =>
+      schema.shape({
+        password: location.pathname.includes("new")
+          ? string().required("Password is required")
+          : string().nullable(),
+        confirm_password: string()
+          .nullable()
+          .oneOf(
+            [ref("password"), null],
+            "Confirm Password must be same as Password"
+          ),
+      }),
+    [location.pathname]
+  );
 
   const user = loaderData?.user.data;
   const _classes = loaderData?.classes.data.classes;
@@ -65,7 +76,6 @@ export function EditUser() {
 
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const {
     register,
@@ -85,38 +95,46 @@ export function EditUser() {
       classes: user?.classes ?? [],
     },
     resolver: yupResolver(
-      schema as ObjectSchema<Omit<IUser & { confirm_password: string }, "id">>
+      schemaWithPassword as ObjectSchema<
+        Omit<IUser & { confirm_password: string }, "id">
+      >
     ),
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const onSubmit = async (
     data: Omit<IUser, "id" | "middle_name" | "password"> & {
       middle_name?: string | null;
       password?: string | null;
     }
   ) => {
-    const response =
-      id === "new"
-        ? await users.create({
-            middle_name: data.middle_name ?? "",
-            password: data.password!,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            role: data.role as "ADMIN" | "STUDENT",
-            username: data.username,
-          })
-        : users.update(Number(id), {
-            middle_name: data.middle_name ?? undefined,
-            password: data.password || undefined,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            role: data.role as "ADMIN" | "STUDENT",
-            username: data.username,
-            _classes: (data.classes as number[]) || undefined,
-          });
-    if (id === "new" && response) {
-      reset();
-      navigate("/admin/_users");
+    try {
+      setIsLoading(true);
+      const response =
+        id === "new"
+          ? await users.create({
+              middle_name: data.middle_name ?? "",
+              password: data.password!,
+              first_name: data.first_name,
+              last_name: data.last_name,
+              role: data.role as "ADMIN" | "STUDENT",
+              username: data.username,
+            })
+          : users.update(Number(id), {
+              middle_name: data.middle_name ?? undefined,
+              password: data.password || undefined,
+              first_name: data.first_name,
+              last_name: data.last_name,
+              role: data.role as "ADMIN" | "STUDENT",
+              username: data.username,
+              _classes: (data.classes as number[]) || undefined,
+            });
+      if (id === "new" && response) {
+        reset();
+        navigate("/admin/_users");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -230,6 +248,7 @@ export function EditUser() {
                 setSelectedOption(data);
               }}
               selectedOption={selectedOption}
+              error={!!errors.role?.message}
             />
             <div
               className={cn(
@@ -249,14 +268,17 @@ export function EditUser() {
         {!location.pathname.includes("view") ? (
           <>
             <AsynSelect
+              className={errors.role?.message ? "selectComponentError" : ""}
               cacheOptions
               // options={classes.map((c) => ({ value: c.id, label: c.name }))}
               loadOptions={async (inputValue) => {
                 const data = await classes.getMany({ name: inputValue });
-                return data?.data.classes.map((c: ClassResponse) => ({
-                  value: c.id,
-                  label: c.name,
-                }))|| [];
+                return (
+                  data?.data.classes.map((c: ClassResponse) => ({
+                    value: c.id,
+                    label: c.name,
+                  })) || []
+                );
               }}
               defaultOptions={_classes?.map((c) => ({
                 value: c.id,
@@ -295,7 +317,9 @@ export function EditUser() {
         )}
       </div>
       {!location.pathname.includes("view") && (
-        <Button type="submit">{id === "new" ? "Create User" : "Save"}</Button>
+        <Button isLoading={isLoading} disabled={isLoading} type="submit">
+          {id === "new" ? "Create User" : "Save"}
+        </Button>
       )}
     </form>
   );

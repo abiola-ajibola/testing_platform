@@ -1,15 +1,16 @@
 import { ResponseWithPagination } from "@/api/baseClients";
-import { question as client, QuestionResponse } from "@/api/question";
-import { buttonVariants } from "@/components/ui/button";
+import { question as client, question, QuestionResponse } from "@/api/question";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/dataTable";
 import { TableActions } from "@/components/ui/tableActions";
+import { buttonVariants } from "@/lib/utils";
 import { ColumnDef, Row, Table } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { Link, useLoaderData } from "react-router-dom";
 
 export function Questions() {
+  const [isLoading, setIsLoading] = useState(false);
   const _questions = useLoaderData<{
     data: ResponseWithPagination<{ questions: QuestionResponse[] }>;
   }>();
@@ -19,32 +20,59 @@ export function Questions() {
   } | null>(null);
 
   const questions = questionsData?.data.questions || _questions.data.questions;
-  const { perPage, total } = questionsData?.data || _questions.data || {};
+  const { perPage, total, currentPage } =
+    questionsData?.data || _questions.data || {};
+
+  const handlePaginationChange = useCallback(
+    async (pageNumber: number, perPage: number) => {
+      setIsLoading(true);
+      try {
+        const q = await question.getMany({ page: pageNumber + 1, perPage });
+        setQuestionssData(q || null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   const handleMultiDelete = useCallback(() => {
     return async function (table: Table<QuestionResponse>) {
-      const model = table.getSelectedRowModel();
-      await Promise.all(
-        model.rows.map(async (row) => {
-          console.log({ row: row.getValue("id") });
-          return await client.delete(row.getValue("id"));
-        })
-      );
-      table.resetRowSelection();
-      const data = await client.getMany();
-      console.log({ data });
-      setQuestionssData(data ? data : null);
+      setIsLoading(true);
+      try {
+        const model = table.getSelectedRowModel();
+        await Promise.all(
+          model.rows.map(async (row) => {
+            console.log({ row: row.getValue("id") });
+            return await client.delete(row.getValue("id"));
+          })
+        );
+        table.resetRowSelection();
+        const data = await client.getMany({ page: currentPage, perPage });
+        console.log({ data });
+        setQuestionssData(data ? data : null);
+      } finally {
+        setIsLoading(false);
+      }
     };
-  }, []);
+  }, [currentPage, perPage]);
 
-  async function handleSingleDelete(row: Row<QuestionResponse>) {
-    console.log({ id: row.getValue("id") });
-    row.toggleSelected(false);
-    await client.delete(row.getValue("id"));
-    const data = await client.getMany();
-    console.log({ data });
-    setQuestionssData(data ? data : null);
-  }
+  const handleSingleDelete = useCallback(
+    async function (row: Row<QuestionResponse>) {
+      setIsLoading(true);
+      try {
+        console.log({ id: row.getValue("id") });
+        row.toggleSelected(false);
+        await client.delete(row.getValue("id"));
+        const data = await client.getMany({ page: currentPage, perPage });
+        console.log({ data });
+        setQuestionssData(data ? data : null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentPage, perPage]
+  );
 
   const columns: ColumnDef<QuestionResponse>[] = useMemo(
     () => [
@@ -105,7 +133,7 @@ export function Questions() {
         },
       },
     ],
-    []
+    [handleSingleDelete]
   );
 
   return (
@@ -122,6 +150,8 @@ export function Questions() {
         data={questions}
         handleDelete={handleMultiDelete()}
         pageCount={total / perPage > 0 ? Math.ceil(total / perPage) : 1}
+        onPaginationChange={handlePaginationChange}
+        isLoading={isLoading}
       />
     </div>
   );
