@@ -21,14 +21,10 @@ export const Question = ({
     <div className="pb-12 mb-16 border-b">
       <p className="mb-4">{question}</p>
       {imageUrl && (
-        <img
-          src={imageUrl}
-          alt="Question"
-          className="object-contain mb-4"
-        />
+        <img src={imageUrl} alt="Question" className="object-contain mb-4" />
       )}
       <div>{options}</div>
-      {/* eslint-disable-next-line no-constant-binary-expression */}
+
       {false && (
         <>
           <Button
