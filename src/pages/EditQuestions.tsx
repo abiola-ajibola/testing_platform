@@ -28,6 +28,7 @@ import { ChangeEvent, ReactNode, useState } from "react";
 import { Check, CheckCircle, HelpCircle, LoaderCircle } from "lucide-react";
 import { get } from "lodash";
 import { cn } from "@/lib/utils";
+import { TextareaGroup } from "@/components/ui/textarea";
 // import { subject } from "@/api/subject";
 // import { classes, ClassResponse } from "@/api/classes";
 // import {
@@ -212,13 +213,12 @@ export function EditQuestion() {
     >
       <div className="mb-3">
         <label className="block font-medium">Question</label>
-        <InputGroup
+        <TextareaGroup
           inputProps={{
-            type: "text",
             ...register("text"),
             disabled: location.pathname.includes("view"),
             className:
-              "disabled:border-none disabled:outline-none disabled:shadow-none",
+              "disabled:border-none disabled:outline-none disabled:shadow-none h-28",
           }}
           className="w-full border p-2 rounded"
           error={!!errors.text?.message}
